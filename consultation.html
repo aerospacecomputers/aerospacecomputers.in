@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Request a Consultation</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Icons -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+  >
+
+  <meta name="description" content="Request a professional IT consultation. 24/7 support available.">
+</head>
+<body>
+
+<!-- ================= NAVBAR (SAME AS INDEX) ================= -->
+  <nav class="nav nav-solid">
+  <div class="nav-inner">
+
+    <div class="logo">
+      <img src="images/logo.svg" alt="Aerospace Computers">
+    </div>
+
+    <ul>
+      <li><a href="index.html">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="contact.html">Contact</a></li>
+      <li><a href="about.html">About</a></li>
+    </ul>
+
+    <a href="consultation.html" class="nav-btn">Get Started</a>
+
+  </div>
+</nav>
+
+
+<!-- ================= CONSULTATION FORM (SAME AS INDEX) ================= -->
+<section class="consult-section" id="consultation">
+  <div class="consult-container">
+
+    <span class="consult-tag">GET IN TOUCH</span>
+    <h2>Request a Consultation</h2>
+    <p class="consult-subtext">
+      Fill out the form below and our team will respond within 2 hours during business hours.
+    </p>
+
+    <form class="consult-form" id="consultForm">
+
+
+      <!-- SERVICE SELECTION -->
+      <label class="form-label">What can we help you with? *</label>
+      <div class="service-options">
+        <label class="service-box">
+          <input type="radio" name="service" value="Schedule Consultation" checked>
+          <i class="fa-solid fa-calendar-check"></i>
+          <span>Schedule Consultation</span>
+        </label>
+
+        <label class="service-box">
+          <input type="radio" name="service" value="AMC Services">
+          <i class="fa-solid fa-shield-halved"></i>
+          <span>AMC Services</span>
+        </label>
+
+        <label class="service-box">
+          <input type="radio" name="service" value="Cybersecurity">
+          <i class="fa-solid fa-lock"></i>
+          <span>Cybersecurity</span>
+        </label>
+
+        <label class="service-box">
+          <input type="radio" name="service" value="Network Infrastructure">
+          <i class="fa-solid fa-network-wired"></i>
+          <span>Network Infrastructure</span>
+        </label>
+
+        <label class="service-box">
+           <input type="radio" name="service" value="IT Support">
+          <i class="fa-solid fa-screwdriver-wrench"></i>
+          <span>IT Support</span>
+        </label>
+
+        <label class="service-box">
+          <input type="radio" name="service" value="Other Services">
+          <i class="fa-solid fa-ellipsis"></i>
+          <span>Other Services</span>
+        </label>
+      </div>
+
+      <!-- INPUT GRID -->
+        <div class="form-grid">
+
+    <div>
+      <label>First Name *</label>
+      <input type="text" name="firstName" required>
+    </div>
+
+    <div>
+      <label>Last Name *</label>
+      <input type="text" name="lastName" required>
+    </div>
+
+    <div>
+      <label>Email Address *</label>
+      <input type="email" name="email" required>
+    </div>
+
+    <div>
+      <label>Phone Number *</label>
+      <input type="tel" name="phone" required>
+    </div>
+
+    <div>
+      <label>Company Name <span class="optional">(Optional)</span></label>
+      <input type="text" name="company" >
+    </div>
+
+    <div>
+      <label>Company Size *</label>
+      <select name="companySize" >
+        <option value="">Select company size (Optional)</option>
+        <option>1–10</option>
+        <option>11–50</option>
+        <option>51–200</option>
+        <option>200+</option>
+        <option>NA</option>
+      </select>
+    </div>
+
+  </div>
+
+      <!-- URGENCY -->
+      <label class="form-label">Urgency Level</label>
+      <div class="urgency-options">
+  <button type="button" class="active" data-level="normal">Normal</button>
+  <button type="button" data-level="urgent">Urgent</button>
+  <button type="button" data-level="high">High Priority</button>
+</div>
+
+<input type="hidden" name="urgency" id="urgencyInput" value="Normal">
+
+
+      <!-- MESSAGE -->
+      <label>How can we help you? *</label>
+<textarea
+  name="message"
+  id="messageInput"
+  minlength="20"
+  required
+></textarea>
+
+<div class="char-info">
+  <span>Minimum 20 characters</span>
+  <span id="charCount">0 characters</span>
+</div>
+
+	  
+	  <p style="font-size:13px;color:#64748b;text-align:center">
+				We respect your privacy. No spam. No sales pressure.
+	</p>
+
+
+      <!-- SUBMIT -->
+      <button type="submit" class="submit-btn" id="submitBtn" disabled>
+  Submit Request
+</button>
+
+
+    </form>
+  </div>
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+<footer class="site-footer">
+  <div class="footer-container">
+
+    <!-- ABOUT -->
+    <div class="footer-col footer-about">
+      <h3>Aerospace<br>Computers</h3>
+      <p>
+        Your trusted technology partner providing comprehensive IT services,
+        cybersecurity solutions, and proactive infrastructure management for
+        businesses of all sizes.
+      </p>
+    </div>
+
+    <!-- QUICK LINKS -->
+    <div class="footer-col">
+      <h4>Quick Links</h4>
+      <ul>
+        <li><a href="#hero">Home</a></li>
+        <li><a href="about.html" target="_blank" rel="noopener noreferrer">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#consultation">Consultation</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </div>
+
+    <!-- SOCIAL -->
+    <div class="footer-col">
+      <h4>Follow Us</h4>
+      <ul class="footer-social">
+	    <li><a href="#"><i class="fa-brands fa-facebook"></i> Facebook</a></li>
+        <li><a href="#"><i class="fa-brands fa-instagram"></i> Instagram</a></li>
+        <li><a href="#"><i class="fa-brands fa-linkedin-in"></i> LinkedIn</a></li>
+        <li><a href="#"><i class="fa-brands fa-x-twitter"></i> Twitter</a></li>
+		<li><a href="https://www.youtube.com/channel/UCuY7Ves3qAFM6oeAAF09Lqw"><i class="fa-brands fa-youtube"></i> Youtube</a></li>
+      </ul>
+    </div>
+
+    <!-- NEWSLETTER -->
+    <div class="footer-col">
+      <h4>Newsletter</h4>
+      <p class="footer-note">Stay updated with our latest news</p>
+
+      <form class="footer-newsletter">
+        <input type="email" placeholder="Your email" required>
+        <button type="submit">
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+    </div>
+
+  </div>
+
+<!-- Script-->
+
+<script>
+
+  console.log("SCRIPT RUNNING");
+document.addEventListener("DOMContentLoaded", () => {
+
+  const form = document.getElementById("consultForm");
+  const textarea = document.getElementById("messageInput");
+  const counter = document.getElementById("charCount");
+  const submitBtn = document.getElementById("submitBtn");
+  const urgencyInput = document.getElementById("urgencyInput");
+
+  // URGENCY BUTTONS
+  document.querySelectorAll(".urgency-options button").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll(".urgency-options button")
+        .forEach(b => b.classList.remove("active"));
+
+      btn.classList.add("active");
+      urgencyInput.value = btn.textContent.trim();
+    });
+  });
+
+  // CHARACTER COUNTER
+  function checkFormValidity() {
+  const len = textarea.value.length;
+  counter.textContent = `${len} characters`;
+
+  if (form.checkValidity() && len >= 20) {
+    submitBtn.disabled = false;
+    submitBtn.classList.add("active");
+  } else {
+    submitBtn.disabled = true;
+    submitBtn.classList.remove("active");
+  }
+}
+
+form.addEventListener("input", checkFormValidity);
+
+  // FORM SUBMIT
+  form.addEventListener("submit", async e => {
+    e.preventDefault();
+    submitBtn.disabled = true;
+
+    const formData = new FormData(form);
+
+    try {
+      const res = await fetch(
+        "https://script.google.com/macros/s/AKfycbzMiuXuXRSiQN8UTelcTZb7HC3f9zVzccFf195dQbMav4VmFRiFWPLV0Jz-9RRGiBcdEA/exec",
+        {
+          method: "POST",
+          body: formData
+        }
+      );
+
+      const result = await res.json();
+
+      if (result.success) {
+        alert(`✅ Request submitted!\nTicket ID: ${result.ticketId}`);
+        form.reset();
+        urgencyInput.value = "Normal";
+        counter.textContent = "0 characters";
+        submitBtn.disabled = true;
+      } else {
+        alert("❌ Submission failed.");
+      }
+    } catch (err) {
+      alert("⚠️ Network error. Please try again.");
+      console.error(err);
+    }
+  });
+
+});
+</script>
+
+
+
+
+</body>
+</html>
+
+
+
