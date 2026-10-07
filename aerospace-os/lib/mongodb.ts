@@ -2,12 +2,6 @@ import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI;
 
-if (!MONGODB_URI) {
-  throw new Error(
-    "Please define the MONGODB_URI environment variable inside .env.local"
-  );
-}
-
 declare global {
   var mongooseConnection:
     | {
@@ -29,8 +23,16 @@ export async function connectMongoDB() {
     return cached.conn;
   }
 
+  const uri = MONGODB_URI;
+
+  if (!uri) {
+    throw new Error(
+      "Please define the MONGODB_URI environment variable inside .env.local or the hosting environment."
+    );
+  }
+
   if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
+    cached.promise = mongoose.connect(uri, {
       dbName: "aerospaceos",
     });
   }
