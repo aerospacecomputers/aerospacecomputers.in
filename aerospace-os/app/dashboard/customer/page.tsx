@@ -1101,14 +1101,14 @@ export default function CustomerDashboard() {
         .brand strong {
           display: block;
           color: #0870bd;
-          font-size: 13px;
+          font-size: 16px;
           letter-spacing: 1px;
         }
 
         .brand span {
           display: block;
           color: #7f91a4;
-          font-size: 10px;
+          font-size: 11px;
           margin-top: 3px;
         }
 
