@@ -2401,6 +2401,20 @@ function QuickAction({
       >
         <Icon name="arrow" size={16} />
       </span>
+
+      <style jsx>{`
+        .quick:hover {
+          border-color: #0b78c8 !important;
+          background: #f7fbff !important;
+          box-shadow: 0 6px 16px rgba(11, 120, 200, 0.14) !important;
+          transform: translateY(-2px);
+        }
+
+        .quick:active {
+          transform: translateY(0);
+          box-shadow: 0 3px 8px rgba(11, 120, 200, 0.10) !important;
+        }
+      `}</style>
     </button>
   );
 }
