@@ -361,7 +361,7 @@ export default function CustomerDashboard() {
             />
           </span>
 
-          <div>
+          <div className="brandText">
             <strong>AEROSPACE OS</strong>
             <span>Customer Portal</span>
           </div>
@@ -1114,34 +1114,41 @@ export default function CustomerDashboard() {
         .brand {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 12px;
           padding: 5px 9px 21px;
           border-bottom: 1px solid #edf1f5;
         }
 
         .brandMark {
           display: block;
-          width: 42px;
-          height: 42px;
+          width: 48px;
+          height: 48px;
           overflow: hidden;
-          flex: 0 0 42px;
+          flex: 0 0 48px;
           position: relative;
         }
 
         .brandMark img {
-          width: 175px;
-          height: 42px;
+          width: 200px;
+          height: 48px;
           max-width: none;
           object-fit: contain;
           object-position: left center;
           display: block;
         }
 
+        .brandText {
+          min-width: 0;
+          flex: 1;
+        }
+
         .brand strong {
           display: block;
           color: #0870bd;
-          font-size: 16px;
-          letter-spacing: 1px;
+          font-size: 15px;
+          line-height: 1.15;
+          letter-spacing: 0.8px;
+          white-space: nowrap;
         }
 
         .brand span {
@@ -1151,6 +1158,7 @@ export default function CustomerDashboard() {
           font-weight: 500;
           margin-top: 4px;
           text-align: center;
+          width: 100%;
         }
 
         nav {
