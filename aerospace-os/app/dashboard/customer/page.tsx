@@ -1522,7 +1522,7 @@ export default function CustomerDashboard() {
 
         .status {
           font-style: normal;
-          font-size: 8px;
+          font-size: 11px;
           font-weight: 700;
           padding: 5px 8px;
           border-radius: 15px;
@@ -1554,9 +1554,10 @@ export default function CustomerDashboard() {
           border: 1px solid #cfe5f5;
           background: #f0f8ff;
           color: #0872bd;
-          border-radius: 5px;
-          padding: 5px 8px;
-          font-size: 8px;
+          border-radius: 6px;
+          padding: 7px 14px;
+          font-size: 11px;
+          font-weight: 700;
           cursor: pointer;
         }
 
@@ -1974,7 +1975,7 @@ export default function CustomerDashboard() {
 
         .requestNumber {
           color: #0871bc;
-          font-size: 10px;
+          font-size: 13px;
           font-weight: 700;
         }
 
@@ -1991,7 +1992,7 @@ export default function CustomerDashboard() {
         .requestSubject span,
         .requestDate {
           color: #8a9aaa;
-          font-size: 11px;
+          font-size: 13px;
           margin-top: 3px;
         }
 
@@ -2634,6 +2635,7 @@ function PageHeader({
   return (
     <>
       <div
+        className="pageHeader"
         style={{
           display: "flex",
           justifyContent: "space-between",
