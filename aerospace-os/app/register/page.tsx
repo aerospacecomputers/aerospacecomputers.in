@@ -9,11 +9,15 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+
   const [customerType, setCustomerType] = useState<
     "individual" | "business"
   >("individual");
+
   const [companyName, setCompanyName] = useState("");
   const [password, setPassword] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -38,7 +42,9 @@ export default function RegisterPage() {
           phone,
           customerType,
           companyName:
-            customerType === "business" ? companyName : "",
+            customerType === "business"
+              ? companyName
+              : "",
           password,
         }),
       });
@@ -46,7 +52,9 @@ export default function RegisterPage() {
       const data = await response.json();
 
       if (!response.ok || !data.success) {
-        setError(data.message || "Unable to create account");
+        setError(
+          data.message || "Unable to create account"
+        );
         setLoading(false);
         return;
       }
@@ -124,6 +132,7 @@ export default function RegisterPage() {
 
               {/* FULL NAME */}
               <div className="field">
+
                 <label htmlFor="name">
                   Full Name
                 </label>
@@ -139,10 +148,12 @@ export default function RegisterPage() {
                   required
                   autoComplete="name"
                 />
+
               </div>
 
               {/* EMAIL */}
               <div className="field">
+
                 <label htmlFor="email">
                   Email Address
                 </label>
@@ -158,10 +169,12 @@ export default function RegisterPage() {
                   required
                   autoComplete="email"
                 />
+
               </div>
 
               {/* PHONE */}
               <div className="field">
+
                 <label htmlFor="phone">
                   Phone Number
                 </label>
@@ -177,10 +190,12 @@ export default function RegisterPage() {
                   required
                   autoComplete="tel"
                 />
+
               </div>
 
               {/* CUSTOMER TYPE */}
               <div className="field">
+
                 <label>
                   Customer Type
                 </label>
@@ -228,11 +243,13 @@ export default function RegisterPage() {
                   </button>
 
                 </div>
+
               </div>
 
               {/* COMPANY NAME */}
               {customerType === "business" && (
                 <div className="field">
+
                   <label htmlFor="companyName">
                     Company Name
                   </label>
@@ -247,31 +264,90 @@ export default function RegisterPage() {
                     placeholder="Enter company name"
                     required
                   />
+
                 </div>
               )}
 
               {/* PASSWORD */}
               <div className="field">
+
                 <label htmlFor="password">
                   Password
                 </label>
 
-                <input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(event) =>
-                    setPassword(event.target.value)
-                  }
-                  placeholder="Create a password"
-                  required
-                  minLength={6}
-                  autoComplete="new-password"
-                />
+                <div className="passwordWrapper">
+
+                  <input
+                    id="password"
+                    type={
+                      showPassword
+                        ? "text"
+                        : "password"
+                    }
+                    value={password}
+                    onChange={(event) =>
+                      setPassword(event.target.value)
+                    }
+                    placeholder="Create a password"
+                    required
+                    minLength={6}
+                    autoComplete="new-password"
+                  />
+
+                  {/* SHOW / HIDE PASSWORD */}
+                  <button
+                    type="button"
+                    className="passwordToggle"
+                    onClick={() =>
+                      setShowPassword(!showPassword)
+                    }
+                    aria-label={
+                      showPassword
+                        ? "Hide password"
+                        : "Show password"
+                    }
+                  >
+                    {showPassword ? (
+                      /* EYE OFF */
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                      >
+                        <path d="M3 3l18 18" />
+
+                        <path d="M10.6 10.6a2 2 0 102.8 2.8" />
+
+                        <path d="M9.9 5.1A10.8 10.8 0 0112 4.9c5.5 0 9 5.1 9 7.1a7.7 7.7 0 01-2.3 3.4" />
+
+                        <path d="M6.2 6.3C3.8 7.8 3 10.3 3 12c0 2 3.5 7.1 9 7.1a10.7 10.7 0 004.1-.8" />
+                      </svg>
+                    ) : (
+                      /* EYE */
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                      >
+                        <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z" />
+
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="2.8"
+                        />
+                      </svg>
+                    )}
+                  </button>
+
+                </div>
 
                 <div className="passwordHint">
                   Minimum 6 characters
                 </div>
+
               </div>
 
               {/* ERROR */}
@@ -307,20 +383,25 @@ export default function RegisterPage() {
 
             </form>
 
-            {/* LOGIN LINK */}
+            {/* BACK TO LOGIN */}
             <div className="backToLogin">
+
               <span>
                 Already have an account?
               </span>
 
               <button
                 type="button"
-                onClick={() => router.push("/login")}
+                onClick={() =>
+                  router.push("/login")
+                }
               >
                 Sign In
               </button>
+
             </div>
 
+            {/* FOOTER */}
             <div className="registerFooter">
               Aerospace Computers · Aerospace OS
               <br />
@@ -502,6 +583,7 @@ export default function RegisterPage() {
 
         .brandLine {
           width: 48px;
+
           height: 3px;
 
           margin: 24px auto 20px;
@@ -689,6 +771,70 @@ export default function RegisterPage() {
         }
 
         /* ================================
+           PASSWORD
+           ================================ */
+
+        .passwordWrapper {
+          position: relative;
+        }
+
+        .passwordWrapper input {
+          padding-right: 50px;
+        }
+
+        .passwordToggle {
+          position: absolute;
+
+          right: 10px;
+
+          top: 50%;
+
+          transform: translateY(-50%);
+
+          width: 32px;
+
+          height: 32px;
+
+          display: flex;
+
+          align-items: center;
+
+          justify-content: center;
+
+          border: none;
+
+          background: transparent;
+
+          color: #71859b;
+
+          cursor: pointer;
+
+          padding: 0;
+
+          border-radius: 6px;
+        }
+
+        .passwordToggle:hover {
+          color: #087cca;
+
+          background: #eef8ff;
+        }
+
+        .passwordToggle svg {
+          width: 19px;
+
+          height: 19px;
+        }
+
+        .passwordHint {
+          margin-top: 5px;
+
+          color: #9aaaba;
+
+          font-size: 10px;
+        }
+
+        /* ================================
            CUSTOMER TYPE
            ================================ */
 
@@ -748,14 +894,6 @@ export default function RegisterPage() {
           display: block;
 
           color: #8192a3;
-
-          font-size: 10px;
-        }
-
-        .passwordHint {
-          margin-top: 5px;
-
-          color: #9aaaba;
 
           font-size: 10px;
         }
