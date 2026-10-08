@@ -1289,38 +1289,37 @@ export default function CustomerDashboard() {
         .statContent {
           position: relative;
           z-index: 1;
-          display: block !important;
-          width: auto !important;
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 10px !important;
+          width: 100%;
           min-width: 0;
           text-align: center;
           white-space: nowrap;
         }
 
-        .stat span {
+        .statLabel {
           display: inline-block;
           color: #526d86;
           font-size: 11px;
           font-weight: 700;
-          text-transform: capitalize;
-          letter-spacing: 0;
           white-space: nowrap;
         }
 
-        .stat strong {
+        .statValue {
           display: inline-flex;
           align-items: center;
           justify-content: center;
           min-width: 30px;
           height: 26px;
           padding: 0 8px;
-          margin: 0 0 0 9px;
           border-radius: 8px;
           background: #f3f7fb;
           color: #173a5b;
           font-size: 17px;
           line-height: 1;
           font-weight: 800;
-          vertical-align: middle;
           box-shadow: inset 0 0 0 1px #e2eaf1;
         }
 
@@ -2255,8 +2254,8 @@ function Stat({
       </div>
 
       <div className="statContent">
-        <span>{title}</span>
-        <strong>{value}</strong>
+        <span className="statLabel">{title}</span>
+        <span className="statValue">{value}</span>
       </div>
     </div>
   );
