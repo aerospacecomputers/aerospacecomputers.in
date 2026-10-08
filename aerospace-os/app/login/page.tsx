@@ -7,7 +7,7 @@ const styles = {
   page: {
     minHeight: "100vh",
     background:
-      "linear-gradient(135deg, #eef6fc 0%, #f8fbff 45%, #e9f3fb 100%)",
+      "linear-gradient(135deg, #eef7fc 0%, #f8fbfe 50%, #eaf5fb 100%)",
     display: "flex",
     alignItems: "center",
     justifyContent: "center",
@@ -24,15 +24,16 @@ const styles = {
     background: "#ffffff",
     borderRadius: "24px",
     overflow: "hidden",
-    boxShadow: "0 25px 70px rgba(7, 36, 70, 0.16)",
+    boxShadow: "0 25px 70px rgba(7, 36, 70, 0.13)",
     border: "1px solid #dbe8f3",
   },
 
+  /* CLEAN LEFT PANEL */
   left: {
     background:
-      "linear-gradient(145deg, #061b35 0%, #0a315c 55%, #075da5 100%)",
+      "linear-gradient(145deg, #ffffff 0%, #f5fbff 55%, #e9f6fc 100%)",
     padding: "52px",
-    color: "#ffffff",
+    color: "#071b35",
     display: "flex",
     flexDirection: "column" as const,
     justifyContent: "space-between",
@@ -40,26 +41,26 @@ const styles = {
     overflow: "hidden",
   },
 
-  leftGlowOne: {
+  blueShape: {
+    position: "absolute" as const,
+    width: "360px",
+    height: "360px",
+    borderRadius: "50%",
+    background:
+      "radial-gradient(circle, rgba(8,123,193,0.13) 0%, rgba(8,123,193,0) 70%)",
+    top: "-150px",
+    right: "-150px",
+  },
+
+  blueShapeBottom: {
     position: "absolute" as const,
     width: "300px",
     height: "300px",
     borderRadius: "50%",
-    background: "rgba(45, 169, 235, 0.16)",
-    top: "-100px",
-    right: "-100px",
-    filter: "blur(10px)",
-  },
-
-  leftGlowTwo: {
-    position: "absolute" as const,
-    width: "260px",
-    height: "260px",
-    borderRadius: "50%",
-    background: "rgba(30, 144, 255, 0.12)",
-    bottom: "-120px",
-    left: "-120px",
-    filter: "blur(10px)",
+    background:
+      "radial-gradient(circle, rgba(45,169,235,0.10) 0%, rgba(45,169,235,0) 70%)",
+    bottom: "-150px",
+    left: "-130px",
   },
 
   logo: {
@@ -81,7 +82,7 @@ const styles = {
     fontWeight: 700,
     letterSpacing: "3px",
     textTransform: "uppercase" as const,
-    color: "#65c5f5",
+    color: "#087bc1",
     marginBottom: "18px",
   },
 
@@ -91,21 +92,34 @@ const styles = {
     fontWeight: 700,
     margin: 0,
     letterSpacing: "-1px",
+    color: "#071b35",
+  },
+
+  leftBlueText: {
+    color: "#087bc1",
   },
 
   leftText: {
     marginTop: "22px",
-    color: "#c9d8e8",
+    color: "#52677d",
     fontSize: "16px",
     lineHeight: 1.7,
     maxWidth: "390px",
+  },
+
+  accentLine: {
+    width: "60px",
+    height: "4px",
+    borderRadius: "10px",
+    background: "linear-gradient(90deg, #087bc1, #45b7e8)",
+    marginTop: "28px",
   },
 
   copyright: {
     position: "relative" as const,
     zIndex: 2,
     fontSize: "12px",
-    color: "#91a9c0",
+    color: "#8295a8",
   },
 
   right: {
@@ -307,8 +321,8 @@ export default function LoginPage() {
 
         {/* LEFT BRAND SECTION */}
         <section style={styles.left}>
-          <div style={styles.leftGlowOne} />
-          <div style={styles.leftGlowTwo} />
+          <div style={styles.blueShape} />
+          <div style={styles.blueShapeBottom} />
 
           <div>
             <img
@@ -325,7 +339,9 @@ export default function LoginPage() {
               <h2 style={styles.leftHeading}>
                 Smarter IT.
                 <br />
-                Better Support.
+                <span style={styles.leftBlueText}>
+                  Better Support.
+                </span>
               </h2>
 
               <p style={styles.leftText}>
@@ -333,6 +349,8 @@ export default function LoginPage() {
                 tickets and infrastructure through one professional
                 service portal.
               </p>
+
+              <div style={styles.accentLine} />
             </div>
           </div>
 
@@ -345,7 +363,6 @@ export default function LoginPage() {
         <section style={styles.right}>
           <div style={styles.formContainer}>
 
-            {/* MOBILE LOGO */}
             <img
               src="https://aerospacecomputers.in/images/logo.svg"
               alt="Aerospace Computers"
@@ -423,9 +440,11 @@ export default function LoginPage() {
 
             <div style={styles.divider}>
               <div style={styles.dividerLine} />
+
               <span style={styles.dividerText}>
                 New Customer?
               </span>
+
               <div style={styles.dividerLine} />
             </div>
 
@@ -447,7 +466,6 @@ export default function LoginPage() {
         </section>
       </div>
 
-      {/* RESPONSIVE STYLE */}
       <style jsx>{`
         @media (max-width: 800px) {
           main {
