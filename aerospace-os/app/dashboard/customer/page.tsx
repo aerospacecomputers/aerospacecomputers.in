@@ -159,6 +159,45 @@ const categories: [IconName, string, string][] = [
 export default function CustomerDashboard() {
   const [page, setPage] = useState<Page>("dashboard");
 
+  function navigateTo(nextPage: Page) {
+    setPage(nextPage);
+
+    const url = new URL(window.location.href);
+    if (nextPage === "dashboard") {
+      url.searchParams.delete("section");
+    } else {
+      url.searchParams.set("section", nextPage);
+    }
+
+    window.history.pushState({ section: nextPage }, "", url.toString());
+  }
+
+  useEffect(() => {
+    function syncPageFromUrl() {
+      const section = new URLSearchParams(window.location.search).get("section");
+      const validSections: Page[] = [
+        "dashboard",
+        "new-request",
+        "requests",
+        "assets",
+        "profile",
+      ];
+
+      if (section && validSections.includes(section as Page)) {
+        navigateTo(section as Page);
+      } else {
+        navigateTo("dashboard");
+      }
+    }
+
+    syncPageFromUrl();
+    window.addEventListener("popstate", syncPageFromUrl);
+
+    return () => {
+      window.removeEventListener("popstate", syncPageFromUrl);
+    };
+  }, []);
+
   const [subject, setSubject] = useState("");
   const [service, setService] = useState("");
   const [description, setDescription] = useState("");
@@ -326,7 +365,7 @@ export default function CustomerDashboard() {
 
           <button
             className={page === "dashboard" ? "nav active" : "nav"}
-            onClick={() => setPage("dashboard")}
+            onClick={() => navigateTo("dashboard")}
           >
             <span className="navIcon"><Icon name="home" size={17} /></span>
             Dashboard
@@ -334,7 +373,7 @@ export default function CustomerDashboard() {
 
           <button
             className={page === "new-request" ? "nav active" : "nav"}
-            onClick={() => setPage("new-request")}
+            onClick={() => navigateTo("new-request")}
           >
             <span className="navIcon"><Icon name="plus" size={17} /></span>
             New Service Request
@@ -342,7 +381,7 @@ export default function CustomerDashboard() {
 
           <button
             className={page === "requests" ? "nav active" : "nav"}
-            onClick={() => setPage("requests")}
+            onClick={() => navigateTo("requests")}
           >
             <span className="navIcon"><Icon name="requests" size={17} /></span>
             Service Requests
@@ -351,7 +390,7 @@ export default function CustomerDashboard() {
 
           <button
             className={page === "assets" ? "nav active" : "nav"}
-            onClick={() => setPage("assets")}
+            onClick={() => navigateTo("assets")}
           >
             <span className="navIcon"><Icon name="assets" size={17} /></span>
             My Assets
@@ -456,7 +495,7 @@ export default function CustomerDashboard() {
 
                       <button
                         className="viewAll"
-                        onClick={() => setPage("requests")}
+                        onClick={() => navigateTo("requests")}
                       >
                         View All →
                       </button>
@@ -487,7 +526,7 @@ export default function CustomerDashboard() {
 
                           <button
                             className="viewButton"
-                            onClick={() => setPage("requests")}
+                            onClick={() => navigateTo("requests")}
                           >
                             View
                           </button>
@@ -506,7 +545,7 @@ export default function CustomerDashboard() {
 
                       <button
                         className="viewAll"
-                        onClick={() => setPage("assets")}
+                        onClick={() => navigateTo("assets")}
                       >
                         View All Assets →
                       </button>
@@ -517,7 +556,7 @@ export default function CustomerDashboard() {
                         <button
                           className="category"
                           key={name}
-                          onClick={() => setPage("assets")}
+                          onClick={() => navigateTo("assets")}
                         >
                           <span className="categoryIcon"><Icon name={icon} size={18} /></span>
                           <small>{name}</small>
@@ -528,7 +567,7 @@ export default function CustomerDashboard() {
 
                     <div className="recentAssetTitle">
                       <strong>Recent Assets</strong>
-                      <button onClick={() => setPage("assets")}>
+                      <button onClick={() => navigateTo("assets")}>
                         View All →
                       </button>
                     </div>
@@ -551,7 +590,7 @@ export default function CustomerDashboard() {
                               setSubject(`${device.name || "Asset"} Service Request`);
                               setService(deviceTypeLabel(device.deviceType));
                               setSelectedDeviceIds([device._id]);
-                              setPage("new-request");
+                              navigateTo("new-request");
                             }}
                           />
                         ))
@@ -568,7 +607,7 @@ export default function CustomerDashboard() {
                 <aside className="rightColumn">
                   <button
                     className="newRequestButton"
-                    onClick={() => setPage("new-request")}
+                    onClick={() => navigateTo("new-request")}
                   >
                     <span className="navIcon"><Icon name="plus" size={17} /></span>
                     New Service Request
@@ -582,35 +621,35 @@ export default function CustomerDashboard() {
                       icon="plus"
                       title="Report an IT Issue"
                       text="Create a new service request"
-                      onClick={() => setPage("new-request")}
+                      onClick={() => navigateTo("new-request")}
                     />
 
                     <QuickAction
                       icon="assets"
                       title="View My Assets"
                       text="See all your registered equipment"
-                      onClick={() => setPage("assets")}
+                      onClick={() => navigateTo("assets")}
                     />
 
                     <QuickAction
                       icon="requests"
                       title="Track Requests"
                       text="Check status of your tickets"
-                      onClick={() => setPage("requests")}
+                      onClick={() => navigateTo("requests")}
                     />
 
                     <QuickAction
                       icon="user"
                       title="Update Profile"
                       text="Manage your account information"
-                      onClick={() => setPage("profile")}
+                      onClick={() => navigateTo("profile")}
                     />
                   </section>
 
                   <section className="sideCard profileCard">
                     <div className="sideCardHeader">
                       <h2>My Profile</h2>
-                      <button onClick={() => setPage("profile")}>
+                      <button onClick={() => navigateTo("profile")}>
                         Edit
                       </button>
                     </div>
@@ -653,7 +692,7 @@ export default function CustomerDashboard() {
               title="Service Requests"
               text="Track all your IT support requests."
               button="+ New Service Request"
-              onClick={() => setPage("new-request")}
+              onClick={() => navigateTo("new-request")}
             >
               <section className="card fullCard">
                 <div className="requestFullList">
@@ -792,7 +831,7 @@ export default function CustomerDashboard() {
                           setSubject(`${device.name || "Asset"} Service Request`);
                           setService(deviceTypeLabel(device.deviceType));
                           setSelectedDeviceIds([device._id]);
-                          setPage("new-request");
+                          navigateTo("new-request");
                         }}
                       />
                     ))
@@ -893,7 +932,7 @@ export default function CustomerDashboard() {
                     <button
                       type="button"
                       className="cancelButton"
-                      onClick={() => setPage("dashboard")}
+                      onClick={() => navigateTo("dashboard")}
                     >
                       Cancel
                     </button>
