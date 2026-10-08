@@ -1596,14 +1596,14 @@ export default function CustomerDashboard() {
         .category small {
           display: block;
           color: #687f95;
-          font-size: 8px;
+          font-size: 10px;
           white-space: nowrap;
         }
 
         .category strong {
           display: block;
           color: #173a5b;
-          font-size: 14px;
+          font-size: 17px;
           margin-top: 3px;
         }
 
@@ -1612,14 +1612,14 @@ export default function CustomerDashboard() {
           display: flex;
           justify-content: space-between;
           color: #294862;
-          font-size: 11px;
+          font-size: 14px;
         }
 
         .recentAssetTitle button {
           border: 0;
           background: transparent;
           color: #0872bd;
-          font-size: 9px;
+          font-size: 11px;
           cursor: pointer;
         }
 
@@ -1697,14 +1697,14 @@ export default function CustomerDashboard() {
 
         .assetType {
           color: #5f7890;
-          font-size: 9px;
+          font-size: 11px;
           font-weight: 700;
         }
 
         .assetDetails {
           margin-top: 7px;
           color: #718499;
-          font-size: 9px;
+          font-size: 11px;
           line-height: 1.6;
           min-height: 42px;
         }
@@ -1948,7 +1948,7 @@ export default function CustomerDashboard() {
         .pageHeader > p {
           margin: 5px 0;
           color: #7e90a2;
-          font-size: 11px;
+          font-size: 14px;
         }
 
         .fullCard {
@@ -1985,13 +1985,13 @@ export default function CustomerDashboard() {
 
         .requestSubject strong {
           color: #304d67;
-          font-size: 11px;
+          font-size: 14px;
         }
 
         .requestSubject span,
         .requestDate {
           color: #8a9aaa;
-          font-size: 9px;
+          font-size: 11px;
           margin-top: 3px;
         }
 
@@ -2027,7 +2027,7 @@ export default function CustomerDashboard() {
 
         .assetCategory small {
           color: #8a9bab;
-          font-size: 9px;
+          font-size: 11px;
           margin-top: 2px;
         }
 
@@ -2048,12 +2048,12 @@ export default function CustomerDashboard() {
           gap: 18px;
         }
 
-        .formGrid label {
+         .formGrid label {
           display: flex;
           flex-direction: column;
           gap: 7px;
           color: #405a73;
-          font-size: 10px;
+          font-size: 12px;
           font-weight: 700;
         }
 
@@ -2072,7 +2072,7 @@ export default function CustomerDashboard() {
           padding: 11px;
           color: #29445e;
           font-family: inherit;
-          font-size: 11px;
+          font-size: 13px;
         }
 
         .formGrid textarea {
