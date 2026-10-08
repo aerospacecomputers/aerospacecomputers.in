@@ -9,6 +9,47 @@ type Page =
   | "assets"
   | "profile";
 
+
+type IconName =
+  | "home" | "plus" | "requests" | "assets" | "user" | "support" | "logout"
+  | "search" | "bell" | "arrow" | "laptop" | "desktop" | "camera" | "printer"
+  | "network" | "server" | "wifi" | "power" | "other" | "check" | "clock"
+  | "settings" | "edit" | "mail" | "phone" | "location" | "calendar";
+
+function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
+  const common = { width: size, height: size, viewBox: "0 0 24 24", fill: "none", stroke: "currentColor", strokeWidth: 1.8, strokeLinecap: "round" as const, strokeLinejoin: "round" as const };
+  const paths: Record<IconName, React.ReactNode> = {
+    home:<><path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V21h13V9.5"/><path d="M9.5 21v-6h5v6"/></>,
+    plus:<><path d="M12 5v14M5 12h14"/></>,
+    requests:<><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></>,
+    assets:<><rect x="3.5" y="4" width="17" height="16" rx="2"/><path d="M8 4v16M16 4v16M3.5 9h17M3.5 15h17"/></>,
+    user:<><circle cx="12" cy="8" r="3.5"/><path d="M5 21c.6-3.5 3.1-5.5 7-5.5s6.4 2 7 5.5"/></>,
+    support:<><circle cx="12" cy="12" r="8.5"/><path d="M8.5 13.5c1.2 1.6 2.4 2.4 3.5 2.4s2.3-.8 3.5-2.4M8.5 9.5h.01M15.5 9.5h.01"/></>,
+    logout:<><path d="M10 5H5v14h5"/><path d="M13 8l4 4-4 4M17 12H8"/></>,
+    search:<><circle cx="10.5" cy="10.5" r="6"/><path d="m15 15 5 5"/></>,
+    bell:<><path d="M18 9a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></>,
+    arrow:<><path d="M5 12h13M13 7l5 5-5 5"/></>,
+    laptop:<><rect x="5" y="4" width="14" height="10" rx="1.5"/><path d="M3 18h18l-2 2H5z"/></>,
+    desktop:<><rect x="4" y="4" width="16" height="12" rx="1.5"/><path d="M12 16v4M8 20h8"/></>,
+    camera:<><path d="M4 8h4l1.5-2h5L16 8h4v10H4z"/><circle cx="12" cy="13" r="3.2"/></>,
+    printer:<><path d="M7 8V4h10v4"/><rect x="4" y="8" width="16" height="9" rx="2"/><path d="M7 14h10v6H7zM17 11h.01"/></>,
+    network:<><circle cx="12" cy="5" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="18" r="2.5"/><path d="M12 7.5V12M12 12 6 15.5M12 12l6 3.5"/></>,
+    server:<><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 12h8M8 17h8M16 7h.01M16 12h.01M16 17h.01"/></>,
+    wifi:<><path d="M4 9a12 12 0 0 1 16 0M7 12a7.5 7.5 0 0 1 10 0M10 15a3.2 3.2 0 0 1 4 0"/><circle cx="12" cy="18.5" r=".7" fill="currentColor"/></>,
+    power:<><path d="M12 3v9"/><path d="M7.2 6.5a8 8 0 1 0 9.6 0"/></>,
+    other:<><circle cx="6" cy="12" r="1" fill="currentColor"/><circle cx="12" cy="12" r="1" fill="currentColor"/><circle cx="18" cy="12" r="1" fill="currentColor"/></>,
+    check:<path d="m5 12 4 4L19 6"/>,
+    clock:<><circle cx="12" cy="12" r="8.5"/><path d="M12 7v5l3 2"/></>,
+    settings:<><circle cx="12" cy="12" r="3"/><path d="m19.4 15 .1.1-1.8 3.1-.2-.1a2 2 0 0 0-2.7.7l-.1.2h-3.6l-.1-.2a2 2 0 0 0-2.7-.7l-.2.1-1.8-3.1.1-.1a2 2 0 0 0 0-3l-.1-.1 1.8-3.1.2.1a2 2 0 0 0 2.7-.7l.1-.2h3.6l.1.2a2 2 0 0 0 2.7.7l.2-.1 1.8 3.1-.1.1a2 2 0 0 0 0 3Z"/></>,
+    edit:<><path d="m4 20 4.2-1 9.6-9.6a2.1 2.1 0 0 0-3-3L5.2 16z"/><path d="m13.5 7.5 3 3"/></>,
+    mail:<><rect x="3" y="5" width="18" height="14" rx="2"/><path d="m4 7 8 6 8-6"/></>,
+    phone:<path d="M7 3.5 10 6l-1.5 3a14 14 0 0 0 6.5 6.5l3-1.5 2.5 3c-1 2-2.8 3-5 2.5C9 17.5 6.5 15 4.5 9c-.5-2.2.5-4 2.5-5.5Z"/>,
+    location:<><path d="M20 10c0 5-8 11-8 11S4 15 4 10a8 8 0 1 1 16 0Z"/><circle cx="12" cy="10" r="2.5"/></>,
+    calendar:<><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 10h18"/></>,
+  };
+  return <svg {...common}>{paths[name]}</svg>;
+}
+
 const requests = [
   {
     id: "SR-20261008-001",
@@ -51,7 +92,7 @@ const assets = [
   {
     name: "Dell Latitude 5420",
     type: "Laptop",
-    icon: "💻",
+    icon: "laptop",
     serial: "DL5420-001",
     location: "Office",
     status: "Active",
@@ -59,7 +100,7 @@ const assets = [
   {
     name: "HP ProDesk 400",
     type: "Desktop",
-    icon: "🖥️",
+    icon: "desktop",
     serial: "HP400-002",
     location: "Office",
     status: "Active",
@@ -67,7 +108,7 @@ const assets = [
   {
     name: "Hikvision IP Camera",
     type: "CCTV Camera",
-    icon: "📹",
+    icon: "camera",
     serial: "HK-CAM-003",
     location: "Reception",
     status: "Active",
@@ -75,23 +116,23 @@ const assets = [
   {
     name: "HP LaserJet Pro",
     type: "Printer",
-    icon: "🖨️",
+    icon: "printer",
     serial: "HP-LJ-005",
     location: "Accounts",
     status: "Under Service",
   },
 ];
 
-const categories = [
-  ["💻", "Laptops", "6"],
-  ["🖥️", "Desktops", "4"],
-  ["📹", "CCTV Cameras", "8"],
-  ["🖨️", "Printers", "3"],
-  ["🌐", "Network Devices", "5"],
-  ["🗄️", "Servers", "2"],
-  ["📡", "Wi-Fi / AP", "4"],
-  ["🔋", "UPS / Power", "2"],
-  ["•••", "Other", "3"],
+const categories: [IconName, string, string][] = [
+  ["laptop", "Laptops", "6"],
+  ["desktop", "Desktops", "4"],
+  ["camera", "CCTV Cameras", "8"],
+  ["printer", "Printers", "3"],
+  ["network", "Network Devices", "5"],
+  ["server", "Servers", "2"],
+  ["wifi", "Wi-Fi / AP", "4"],
+  ["power", "UPS / Power", "2"],
+  ["other", "Other", "3"],
 ];
 
 export default function CustomerDashboard() {
@@ -101,6 +142,9 @@ export default function CustomerDashboard() {
   const [service, setService] = useState("");
   const [description, setDescription] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [editingProfile, setEditingProfile] = useState(false);
+  const [profile, setProfile] = useState({ name: "Jitesh Kukreja", email: "jitesh@example.com", phone: "+91 98765 43210", address: "Delhi, India" });
+  const [profileDraft, setProfileDraft] = useState(profile);
 
   function logout() {
     window.location.href = "/api/auth/logout";
@@ -110,6 +154,9 @@ export default function CustomerDashboard() {
     e.preventDefault();
     setSubmitted(true);
   }
+
+  function openProfileEditor() { setProfileDraft(profile); setEditingProfile(true); }
+  function saveProfile() { setProfile(profileDraft); setEditingProfile(false); }
 
   function statusClass(status: string) {
     if (status === "Completed") return "green";
@@ -141,7 +188,7 @@ export default function CustomerDashboard() {
             className={page === "dashboard" ? "nav active" : "nav"}
             onClick={() => setPage("dashboard")}
           >
-            <span>⌂</span>
+            <span className="navIcon"><Icon name="home" size={17} /></span>
             Dashboard
           </button>
 
@@ -149,7 +196,7 @@ export default function CustomerDashboard() {
             className={page === "new-request" ? "nav active" : "nav"}
             onClick={() => setPage("new-request")}
           >
-            <span>＋</span>
+            <span className="navIcon"><Icon name="plus" size={17} /></span>
             New Service Request
           </button>
 
@@ -157,7 +204,7 @@ export default function CustomerDashboard() {
             className={page === "requests" ? "nav active" : "nav"}
             onClick={() => setPage("requests")}
           >
-            <span>▣</span>
+            <span className="navIcon"><Icon name="requests" size={17} /></span>
             Service Requests
             <b>5</b>
           </button>
@@ -166,7 +213,7 @@ export default function CustomerDashboard() {
             className={page === "assets" ? "nav active" : "nav"}
             onClick={() => setPage("assets")}
           >
-            <span>▦</span>
+            <span className="navIcon"><Icon name="assets" size={17} /></span>
             My Assets
             <b>9</b>
           </button>
@@ -175,21 +222,21 @@ export default function CustomerDashboard() {
 
           <button
             className={page === "profile" ? "nav active" : "nav"}
-            onClick={() => setPage("profile")}
+            onClick={openProfileEditor}
           >
-            <span>●</span>
+            <span className="navIcon"><Icon name="user" size={17} /></span>
             My Profile
           </button>
         </nav>
 
         <div className="sidebarBottom">
           <button className="nav">
-            <span>♧</span>
+            <span className="navIcon"><Icon name="support" size={17} /></span>
             Support
           </button>
 
           <button className="nav" onClick={logout}>
-            <span>↪</span>
+            <span className="navIcon"><Icon name="logout" size={17} /></span>
             Logout
           </button>
 
@@ -214,13 +261,13 @@ export default function CustomerDashboard() {
           </div>
 
           <div className="topRight">
-            <button className="bell">♧</button>
+            <button className="bell" aria-label="Notifications"><Icon name="bell" size={18} /></button>
 
             <div className="profileMini">
-              <div className="avatar">JC</div>
+              <div className="avatar">{profile.name.split(" ").map(n => n[0]).slice(0,2).join("").toUpperCase()}</div>
 
               <div>
-                <strong>Jitesh Chauhan</strong>
+                <strong>{profile.name}</strong>
                 <span>Customer Account</span>
               </div>
 
@@ -236,7 +283,7 @@ export default function CustomerDashboard() {
               <section className="hero">
                 <div>
                   <small>GOOD MORNING</small>
-                  <h1>Welcome back, Jitesh! 👋</h1>
+                  <h1>Welcome back, Jitesh!</h1>
                   <p>
                     Here&apos;s an overview of your IT service activity and
                     assets.
@@ -253,10 +300,10 @@ export default function CustomerDashboard() {
                 <div className="mainColumn">
                   {/* STATS */}
                   <div className="stats">
-                    <Stat icon="▣" title="Total Requests" value="12" type="blue" />
-                    <Stat icon="◷" title="Pending" value="3" type="orange" />
-                    <Stat icon="⚙" title="In Progress" value="4" type="purple" />
-                    <Stat icon="✓" title="Completed" value="5" type="green" />
+                    <Stat icon="requests" title="Total Requests" value="12" type="blue" />
+                    <Stat icon="clock" title="Pending" value="3" type="orange" />
+                    <Stat icon="settings" title="In Progress" value="4" type="purple" />
+                    <Stat icon="check" title="Completed" value="5" type="green" />
                   </div>
 
                   {/* REQUESTS */}
@@ -332,7 +379,7 @@ export default function CustomerDashboard() {
                           key={name}
                           onClick={() => setPage("assets")}
                         >
-                          <span>{icon}</span>
+                          <span className="categoryIcon"><Icon name={icon} size={18} /></span>
                           <small>{name}</small>
                           <strong>{count}</strong>
                         </button>
@@ -368,7 +415,7 @@ export default function CustomerDashboard() {
                     className="newRequestButton"
                     onClick={() => setPage("new-request")}
                   >
-                    <span>＋</span>
+                    <span className="navIcon"><Icon name="plus" size={17} /></span>
                     New Service Request
                     <b>→</b>
                   </button>
@@ -414,25 +461,25 @@ export default function CustomerDashboard() {
                     </div>
 
                     <div className="bigProfile">
-                      <div className="bigAvatar">JC</div>
+                      <div className="bigAvatar">{profile.name.split(" ").map(n => n[0]).slice(0,2).join("").toUpperCase()}</div>
 
                       <div>
-                        <strong>Jitesh Chauhan</strong>
+                        <strong>{profile.name}</strong>
                         <span>Individual Customer</span>
                       </div>
                     </div>
 
                     <div className="profileInfo">
-                      <p>✉ jitesh@example.com</p>
-                      <p>☎ +91 98765 43210</p>
-                      <p>⌖ Delhi, India</p>
-                      <p>▣ Individual Account</p>
-                      <p>▦ Member since Oct 2026</p>
+                      <p><Icon name="mail" size={12} /> {profile.email}</p>
+                      <p><Icon name="phone" size={12} /> {profile.phone}</p>
+                      <p><Icon name="location" size={12} /> {profile.address}</p>
+                      <p><Icon name="user" size={12} /> Individual Account</p>
+                      <p><Icon name="calendar" size={12} /> Member since Oct 2026</p>
                     </div>
                   </section>
 
                   <section className="helpCard">
-                    <div className="helpIcon">♧</div>
+                    <div className="helpIcon"><Icon name="support" size={18} /></div>
                     <h2>Need Help?</h2>
                     <p>
                       Contact our support team for immediate assistance.
@@ -488,7 +535,7 @@ export default function CustomerDashboard() {
               <div className="assetCategoryGrid">
                 {categories.map(([icon, name, count]) => (
                   <div className="assetCategory" key={name}>
-                    <span>{icon}</span>
+                    <span className="categoryIcon"><Icon name={icon} size={18} /></span>
                     <div>
                       <strong>{count}</strong>
                       <small>{name}</small>
@@ -620,11 +667,11 @@ export default function CustomerDashboard() {
                 <div className="profilePageAvatar">JC</div>
 
                 <div>
-                  <h2>Jitesh Chauhan</h2>
+                  <h2>{profile.name}</h2>
                   <p>Individual Customer</p>
                 </div>
 
-                <div className="profileDetails">
+                <button className="profileEditButton" onClick={openProfileEditor}><Icon name="edit" size={13} /> Edit Profile</button><div className="profileDetails">
                   <div>
                     <small>Email</small>
                     <strong>jitesh@example.com</strong>
@@ -651,6 +698,27 @@ export default function CustomerDashboard() {
         </div>
       </main>
 
+
+      {editingProfile && (
+        <div className="modalBackdrop" onMouseDown={(e) => { if (e.target === e.currentTarget) setEditingProfile(false); }}>
+          <div className="profileModal">
+            <div className="modalHeader">
+              <div><span>ACCOUNT</span><h2>Edit Profile</h2><p>Update your customer information.</p></div>
+              <button className="modalClose" onClick={() => setEditingProfile(false)}>×</button>
+            </div>
+            <div className="modalBody">
+              <div className="profileEditGrid">
+                <label>Full Name<input value={profileDraft.name} onChange={(e) => setProfileDraft({...profileDraft,name:e.target.value})} /></label>
+                <label>Email<input type="email" value={profileDraft.email} onChange={(e) => setProfileDraft({...profileDraft,email:e.target.value})} /></label>
+                <label>Phone<input value={profileDraft.phone} onChange={(e) => setProfileDraft({...profileDraft,phone:e.target.value})} /></label>
+                <label>Address<input value={profileDraft.address} onChange={(e) => setProfileDraft({...profileDraft,address:e.target.value})} /></label>
+              </div>
+              <div className="readonlyField"><span>Customer Type</span><strong>Individual Customer</strong><small>Customer type is managed by Aerospace OS.</small></div>
+            </div>
+            <div className="modalFooter"><button className="cancelButton" onClick={() => setEditingProfile(false)}>Cancel</button><button className="submitButton" onClick={saveProfile}>Save Changes <Icon name="check" size={13} /></button></div>
+          </div>
+        </div>
+      )}
       <style jsx>{`
         * {
           box-sizing: border-box;
@@ -1743,7 +1811,28 @@ export default function CustomerDashboard() {
           margin-top: 3px;
         }
 
-        /* RESPONSIVE */
+
+        .profilePageTop { display:flex; align-items:center; gap:17px; width:100%; }
+        .profileEditButton { margin-left:auto; border:1px solid #cfe5f5; background:#f0f8ff; color:#0872bd; border-radius:6px; padding:8px 11px; display:flex; align-items:center; gap:6px; font-size:9px; font-weight:700; cursor:pointer; }
+        .modalBackdrop { position:fixed; inset:0; z-index:100; background:rgba(10,38,65,.34); backdrop-filter:blur(3px); display:grid; place-items:center; padding:18px; }
+        .profileModal { width:min(560px,100%); background:#fff; border-radius:14px; box-shadow:0 22px 70px rgba(11,48,82,.24); overflow:hidden; }
+        .modalHeader { padding:22px 24px 18px; border-bottom:1px solid #edf1f5; display:flex; justify-content:space-between; align-items:flex-start; }
+        .modalHeader span { color:#0876c5; font-size:8px; font-weight:800; letter-spacing:1.5px; }
+        .modalHeader h2 { margin:5px 0 3px; color:#173858; font-size:18px; }
+        .modalHeader p { margin:0; color:#8798a9; font-size:10px; }
+        .modalClose { border:0; background:#f2f6fa; color:#65788c; width:30px; height:30px; border-radius:50%; font-size:20px; cursor:pointer; }
+        .modalBody { padding:22px 24px; }
+        .profileEditGrid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
+        .profileEditGrid label { display:flex; flex-direction:column; gap:7px; color:#405a73; font-size:10px; font-weight:700; }
+        .profileEditGrid input { width:100%; border:1px solid #dbe5ee; border-radius:7px; background:#fbfdff; outline:none; padding:11px; color:#29445e; font-family:inherit; font-size:11px; }
+        .profileEditGrid input:focus { border-color:#4b9bd1; box-shadow:0 0 0 3px rgba(8,118,197,.08); }
+        .readonlyField { margin-top:17px; padding:12px; background:#f7fafc; border:1px solid #e7eef4; border-radius:8px; }
+        .readonlyField span,.readonlyField strong,.readonlyField small { display:block; }
+        .readonlyField span { color:#96a3b0; font-size:8px; }
+        .readonlyField strong { color:#4a6279; font-size:10px; margin-top:4px; }
+        .readonlyField small { color:#9aa8b5; font-size:8px; margin-top:3px; }
+        .modalFooter { padding:15px 24px; border-top:1px solid #edf1f5; display:flex; justify-content:flex-end; gap:9px; }
+\n        /* RESPONSIVE */
 
         @media (max-width: 1200px) {
           .dashboardGrid {
@@ -1849,7 +1938,7 @@ export default function CustomerDashboard() {
           }
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 600px) {\n          .profileEditGrid { grid-template-columns:1fr; }\n          .profilePageTop { flex-wrap:wrap; }\n          .profileEditButton { margin-left:0; }
           .topbar {
             padding: 0 12px;
           }
@@ -1979,14 +2068,14 @@ function QuickAction({
 }) {
   return (
     <button className="quick" onClick={onClick}>
-      <div className="quickIcon">{icon}</div>
+      <div className="quickIcon"><Icon name={icon} size={16} /></div>
 
       <div>
         <strong>{title}</strong>
         <span>{text}</span>
       </div>
 
-      <b>›</b>
+      <b><Icon name="arrow" size={14} /></b>
     </button>
   );
 }
