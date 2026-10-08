@@ -55,6 +55,9 @@ type CustomerRequest = {
   requestNumber: string;
   subject: string;
   serviceType?: string;
+  description?: string;
+  preferredDate?: string;
+  preferredTime?: string;
   status: string;
   createdAt?: string;
 };
@@ -172,6 +175,7 @@ export default function CustomerDashboard() {
   const [devices, setDevices] = useState<CustomerDevice[]>([]);
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<string[]>([]);
   const [requests, setRequests] = useState<CustomerRequest[]>([]);
+  const [selectedRequest, setSelectedRequest] = useState<CustomerRequest | null>(null);
 
   useEffect(() => {
     async function loadProfile() {
@@ -668,12 +672,76 @@ export default function CustomerDashboard() {
                         {requestStatusLabel(r.status)}
                       </em>
 
-                      <button className="viewButton">View</button>
+                      <button
+                        className="viewButton"
+                        onClick={() => setSelectedRequest(r)}
+                      >
+                        View
+                      </button>
                     </div>
                   ))}
                 </div>
               </section>
             </PageHeader>
+          )}
+
+          {selectedRequest && (
+            <div className="modalBackdrop" onClick={() => setSelectedRequest(null)}>
+              <div className="requestModal" onClick={(event) => event.stopPropagation()}>
+                <div className="modalHeader">
+                  <div>
+                    <span>SERVICE REQUEST</span>
+                    <h2>{selectedRequest.requestNumber}</h2>
+                    <p>Request details and current status</p>
+                  </div>
+                  <button className="modalClose" onClick={() => setSelectedRequest(null)}>×</button>
+                </div>
+
+                <div className="requestModalBody">
+                  <div className="requestDetailGrid">
+                    <div>
+                      <small>SUBJECT</small>
+                      <strong>{selectedRequest.subject}</strong>
+                    </div>
+                    <div>
+                      <small>SERVICE TYPE</small>
+                      <strong>{selectedRequest.serviceType || "General IT Support"}</strong>
+                    </div>
+                    <div>
+                      <small>STATUS</small>
+                      <strong>
+                        <em className={`status ${requestStatusClass(selectedRequest.status)}`}>
+                          {requestStatusLabel(selectedRequest.status)}
+                        </em>
+                      </strong>
+                    </div>
+                    <div>
+                      <small>SUBMITTED</small>
+                      <strong>{formatRequestDate(selectedRequest.createdAt)}</strong>
+                    </div>
+                    <div>
+                      <small>PREFERRED DATE</small>
+                      <strong>{selectedRequest.preferredDate || "—"}</strong>
+                    </div>
+                    <div>
+                      <small>PREFERRED TIME</small>
+                      <strong>{selectedRequest.preferredTime || "—"}</strong>
+                    </div>
+                  </div>
+
+                  <div className="requestDescription">
+                    <small>DESCRIPTION</small>
+                    <p>{selectedRequest.description || "No description provided."}</p>
+                  </div>
+                </div>
+
+                <div className="modalFooter">
+                  <button className="cancelButton" onClick={() => setSelectedRequest(null)}>
+                    Close
+                  </button>
+                </div>
+              </div>
+            </div>
           )}
 
           {/* ASSETS PAGE */}
@@ -2110,6 +2178,14 @@ export default function CustomerDashboard() {
         }
 
 
+        .requestModal { width:min(620px,100%); background:#fff; border-radius:14px; box-shadow:0 22px 70px rgba(11,48,82,.24); overflow:hidden; }
+        .requestModalBody { padding:22px 24px; }
+        .requestDetailGrid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+        .requestDetailGrid small, .requestDetailGrid strong, .requestDescription small { display:block; }
+        .requestDetailGrid small, .requestDescription small { color:#96a3b0; font-size:8px; font-weight:700; letter-spacing:.6px; }
+        .requestDetailGrid strong { color:#4a6279; font-size:10px; margin-top:5px; }
+        .requestDescription { margin-top:20px; padding-top:17px; border-top:1px solid #edf1f5; }
+        .requestDescription p { margin:7px 0 0; color:#62788d; font-size:10px; line-height:1.6; white-space:pre-wrap; }
         .profilePageTop { display:flex; align-items:center; gap:17px; width:100%; }
         .profileEditButton { margin-left:auto; border:1px solid #cfe5f5; background:#f0f8ff; color:#0872bd; border-radius:6px; padding:8px 11px; display:flex; align-items:center; gap:6px; font-size:9px; font-weight:700; cursor:pointer; }
         .modalBackdrop { position:fixed; inset:0; z-index:100; background:rgba(10,38,65,.34); backdrop-filter:blur(3px); display:grid; place-items:center; padding:18px; }
