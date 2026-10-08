@@ -3,6 +3,257 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 
+const styles = {
+  page: {
+    minHeight: "100vh",
+    background:
+      "linear-gradient(135deg, #eef6fc 0%, #f8fbff 45%, #e9f3fb 100%)",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "32px 20px",
+    fontFamily: "Arial, Helvetica, sans-serif",
+  },
+
+  container: {
+    width: "100%",
+    maxWidth: "1080px",
+    minHeight: "650px",
+    display: "grid",
+    gridTemplateColumns: "45% 55%",
+    background: "#ffffff",
+    borderRadius: "24px",
+    overflow: "hidden",
+    boxShadow: "0 25px 70px rgba(7, 36, 70, 0.16)",
+    border: "1px solid #dbe8f3",
+  },
+
+  left: {
+    background:
+      "linear-gradient(145deg, #061b35 0%, #0a315c 55%, #075da5 100%)",
+    padding: "52px",
+    color: "#ffffff",
+    display: "flex",
+    flexDirection: "column" as const,
+    justifyContent: "space-between",
+    position: "relative" as const,
+    overflow: "hidden",
+  },
+
+  leftGlowOne: {
+    position: "absolute" as const,
+    width: "300px",
+    height: "300px",
+    borderRadius: "50%",
+    background: "rgba(45, 169, 235, 0.16)",
+    top: "-100px",
+    right: "-100px",
+    filter: "blur(10px)",
+  },
+
+  leftGlowTwo: {
+    position: "absolute" as const,
+    width: "260px",
+    height: "260px",
+    borderRadius: "50%",
+    background: "rgba(30, 144, 255, 0.12)",
+    bottom: "-120px",
+    left: "-120px",
+    filter: "blur(10px)",
+  },
+
+  logo: {
+    width: "250px",
+    height: "auto",
+    display: "block",
+    position: "relative" as const,
+    zIndex: 2,
+  },
+
+  leftContent: {
+    position: "relative" as const,
+    zIndex: 2,
+    marginTop: "40px",
+  },
+
+  smallTitle: {
+    fontSize: "13px",
+    fontWeight: 700,
+    letterSpacing: "3px",
+    textTransform: "uppercase" as const,
+    color: "#65c5f5",
+    marginBottom: "18px",
+  },
+
+  leftHeading: {
+    fontSize: "42px",
+    lineHeight: 1.15,
+    fontWeight: 700,
+    margin: 0,
+    letterSpacing: "-1px",
+  },
+
+  leftText: {
+    marginTop: "22px",
+    color: "#c9d8e8",
+    fontSize: "16px",
+    lineHeight: 1.7,
+    maxWidth: "390px",
+  },
+
+  copyright: {
+    position: "relative" as const,
+    zIndex: 2,
+    fontSize: "12px",
+    color: "#91a9c0",
+  },
+
+  right: {
+    background: "#ffffff",
+    padding: "48px 58px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+
+  formContainer: {
+    width: "100%",
+    maxWidth: "430px",
+  },
+
+  mobileLogo: {
+    width: "210px",
+    height: "auto",
+    margin: "0 auto 30px",
+    display: "block",
+  },
+
+  welcomeLabel: {
+    display: "inline-block",
+    background: "#e9f5ff",
+    color: "#0765b5",
+    fontSize: "12px",
+    fontWeight: 700,
+    letterSpacing: "1.5px",
+    textTransform: "uppercase" as const,
+    padding: "8px 14px",
+    borderRadius: "30px",
+    marginBottom: "16px",
+  },
+
+  heading: {
+    fontSize: "38px",
+    lineHeight: 1.15,
+    fontWeight: 700,
+    color: "#071b35",
+    margin: 0,
+    letterSpacing: "-1px",
+  },
+
+  headingBlue: {
+    color: "#087bc1",
+    display: "block",
+    marginTop: "4px",
+  },
+
+  subtitle: {
+    color: "#718096",
+    fontSize: "15px",
+    lineHeight: 1.6,
+    marginTop: "14px",
+    marginBottom: "30px",
+  },
+
+  field: {
+    marginBottom: "20px",
+  },
+
+  label: {
+    display: "block",
+    fontSize: "13px",
+    fontWeight: 700,
+    color: "#26384d",
+    marginBottom: "8px",
+  },
+
+  input: {
+    width: "100%",
+    height: "52px",
+    border: "1px solid #d2deea",
+    borderRadius: "10px",
+    background: "#f9fbfd",
+    padding: "0 15px",
+    fontSize: "15px",
+    color: "#14283f",
+    outline: "none",
+    boxSizing: "border-box" as const,
+  },
+
+  error: {
+    background: "#fff1f1",
+    border: "1px solid #f3caca",
+    color: "#c62828",
+    borderRadius: "10px",
+    padding: "12px 14px",
+    fontSize: "13px",
+    marginBottom: "18px",
+  },
+
+  signIn: {
+    width: "100%",
+    height: "52px",
+    border: "none",
+    borderRadius: "10px",
+    background: "linear-gradient(135deg, #087bc1, #0759a2)",
+    color: "#ffffff",
+    fontSize: "15px",
+    fontWeight: 700,
+    cursor: "pointer",
+    boxShadow: "0 8px 20px rgba(8, 123, 193, 0.22)",
+  },
+
+  divider: {
+    display: "flex",
+    alignItems: "center",
+    gap: "12px",
+    margin: "25px 0",
+  },
+
+  dividerLine: {
+    height: "1px",
+    background: "#e2e8f0",
+    flex: 1,
+  },
+
+  dividerText: {
+    color: "#9aa8b6",
+    fontSize: "11px",
+    fontWeight: 700,
+    letterSpacing: "1px",
+    textTransform: "uppercase" as const,
+  },
+
+  register: {
+    width: "100%",
+    height: "52px",
+    border: "1.5px solid #087bc1",
+    borderRadius: "10px",
+    background: "#ffffff",
+    color: "#0870b5",
+    fontSize: "15px",
+    fontWeight: 700,
+    cursor: "pointer",
+  },
+
+  footer: {
+    textAlign: "center" as const,
+    color: "#a0adba",
+    fontSize: "11px",
+    lineHeight: 1.6,
+    marginTop: "22px",
+  },
+};
+
 export default function LoginPage() {
   const router = useRouter();
 
@@ -51,170 +302,186 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="min-h-screen bg-slate-50 flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-6xl overflow-hidden rounded-3xl bg-white shadow-2xl border border-slate-200">
-        <div className="grid min-h-[650px] md:grid-cols-2">
+    <main style={styles.page}>
+      <div style={styles.container}>
 
-          {/* LEFT BRAND PANEL */}
-          <div className="relative hidden md:flex flex-col justify-between overflow-hidden bg-[#071a36] p-12 text-white">
-            <div className="absolute -right-24 -top-24 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" />
-            <div className="absolute -bottom-24 -left-24 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
+        {/* LEFT BRAND SECTION */}
+        <section style={styles.left}>
+          <div style={styles.leftGlowOne} />
+          <div style={styles.leftGlowTwo} />
 
-            <div className="relative z-10">
-              <img
-                src="https://aerospacecomputers.in/images/logo.svg"
-                alt="Aerospace Computers"
-                className="h-16 w-auto object-contain object-left brightness-0 invert"
-              />
-            </div>
+          <div>
+            <img
+              src="https://aerospacecomputers.in/images/logo.svg"
+              alt="Aerospace Computers"
+              style={styles.logo}
+            />
 
-            <div className="relative z-10 max-w-md">
-              <p className="mb-4 text-sm font-semibold uppercase tracking-[0.25em] text-blue-300">
+            <div style={styles.leftContent}>
+              <div style={styles.smallTitle}>
                 Service Operations Portal
-              </p>
+              </div>
 
-              <h2 className="text-5xl font-bold leading-tight">
-                Manage your IT
-                <span className="block text-blue-300">
-                  with confidence.
-                </span>
+              <h2 style={styles.leftHeading}>
+                Smarter IT.
+                <br />
+                Better Support.
               </h2>
 
-              <p className="mt-6 text-lg leading-8 text-slate-300">
-                A professional service portal for managing requests,
-                support operations, tickets and IT infrastructure.
+              <p style={styles.leftText}>
+                Manage your IT service requests, support operations,
+                tickets and infrastructure through one professional
+                service portal.
               </p>
-            </div>
-
-            <div className="relative z-10 text-sm text-slate-400">
-              © {new Date().getFullYear()} Aerospace Computers
             </div>
           </div>
 
-          {/* RIGHT LOGIN PANEL */}
-          <div className="flex items-center justify-center px-6 py-10 sm:px-10 lg:px-16">
-            <div className="w-full max-w-md">
+          <div style={styles.copyright}>
+            © {new Date().getFullYear()} Aerospace Computers
+          </div>
+        </section>
 
-              {/* MOBILE LOGO */}
-              <div className="mb-8 flex justify-center md:hidden">
-                <img
-                  src="https://aerospacecomputers.in/images/logo.svg"
-                  alt="Aerospace Computers"
-                  className="h-14 w-auto object-contain"
+        {/* RIGHT LOGIN SECTION */}
+        <section style={styles.right}>
+          <div style={styles.formContainer}>
+
+            {/* MOBILE LOGO */}
+            <img
+              src="https://aerospacecomputers.in/images/logo.svg"
+              alt="Aerospace Computers"
+              style={styles.mobileLogo}
+            />
+
+            <div style={styles.welcomeLabel}>
+              Aerospace OS
+            </div>
+
+            <h1 style={styles.heading}>
+              Welcome to
+              <span style={styles.headingBlue}>
+                Aerospace OS
+              </span>
+            </h1>
+
+            <p style={styles.subtitle}>
+              Sign in to access your service operations portal.
+            </p>
+
+            <form onSubmit={handleSubmit}>
+
+              <div style={styles.field}>
+                <label htmlFor="email" style={styles.label}>
+                  Email Address
+                </label>
+
+                <input
+                  id="email"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="Enter your email"
+                  required
+                  autoComplete="email"
+                  style={styles.input}
                 />
               </div>
 
-              {/* HEADING */}
-              <div className="mb-8 text-center">
-                <div className="mb-3 inline-flex rounded-full bg-blue-50 px-4 py-1.5 text-xs font-semibold uppercase tracking-wider text-blue-700">
-                  Aerospace OS
-                </div>
+              <div style={styles.field}>
+                <label htmlFor="password" style={styles.label}>
+                  Password
+                </label>
 
-                <h1 className="text-4xl font-bold tracking-tight text-[#071a36] sm:text-5xl">
-                  Welcome to
-                  <span className="block text-blue-600">
-                    Aerospace OS
-                  </span>
-                </h1>
-
-                <p className="mt-4 text-sm leading-6 text-slate-500">
-                  Sign in to access your service operations portal.
-                </p>
+                <input
+                  id="password"
+                  type="password"
+                  value={password}
+                  onChange={(event) => setPassword(event.target.value)}
+                  placeholder="Enter your password"
+                  required
+                  autoComplete="current-password"
+                  style={styles.input}
+                />
               </div>
 
-              {/* LOGIN CARD */}
-              <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-
-                <form onSubmit={handleSubmit} className="space-y-5">
-
-                  {/* EMAIL */}
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="mb-2 block text-sm font-semibold text-slate-700"
-                    >
-                      Email Address
-                    </label>
-
-                    <input
-                      id="email"
-                      type="email"
-                      value={email}
-                      onChange={(event) => setEmail(event.target.value)}
-                      placeholder="Enter your email"
-                      required
-                      autoComplete="email"
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3.5 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
-                    />
-                  </div>
-
-                  {/* PASSWORD */}
-                  <div>
-                    <label
-                      htmlFor="password"
-                      className="mb-2 block text-sm font-semibold text-slate-700"
-                    >
-                      Password
-                    </label>
-
-                    <input
-                      id="password"
-                      type="password"
-                      value={password}
-                      onChange={(event) => setPassword(event.target.value)}
-                      placeholder="Enter your password"
-                      required
-                      autoComplete="current-password"
-                      className="w-full rounded-xl border border-slate-300 bg-slate-50 px-4 py-3.5 text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-blue-500 focus:bg-white focus:ring-4 focus:ring-blue-100"
-                    />
-                  </div>
-
-                  {/* ERROR */}
-                  {error && (
-                    <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-medium text-red-700">
-                      {error}
-                    </div>
-                  )}
-
-                  {/* SIGN IN */}
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="w-full rounded-xl bg-[#0757b8] px-5 py-3.5 text-sm font-bold text-white shadow-lg shadow-blue-900/20 transition hover:bg-[#064b9d] focus:outline-none focus:ring-4 focus:ring-blue-200 disabled:cursor-not-allowed disabled:opacity-60"
-                  >
-                    {loading ? "Signing In..." : "Sign In"}
-                  </button>
-                </form>
-
-                {/* REGISTER */}
-                <div className="my-6 flex items-center gap-3">
-                  <div className="h-px flex-1 bg-slate-200" />
-                  <span className="text-xs font-medium uppercase tracking-wider text-slate-400">
-                    New customer?
-                  </span>
-                  <div className="h-px flex-1 bg-slate-200" />
+              {error && (
+                <div style={styles.error}>
+                  {error}
                 </div>
+              )}
 
-                <button
-                  type="button"
-                  onClick={() => router.push("/register")}
-                  className="w-full rounded-xl border-2 border-[#0757b8] bg-white px-5 py-3.5 text-sm font-bold text-[#0757b8] transition hover:bg-blue-50 focus:outline-none focus:ring-4 focus:ring-blue-100"
-                >
-                  Create an Account
-                </button>
-              </div>
+              <button
+                type="submit"
+                disabled={loading}
+                style={{
+                  ...styles.signIn,
+                  opacity: loading ? 0.65 : 1,
+                }}
+              >
+                {loading ? "Signing In..." : "Sign In"}
+              </button>
+            </form>
 
-              {/* FOOTER */}
-              <p className="mt-6 text-center text-xs leading-5 text-slate-400">
-                Aerospace Computers · Aerospace OS
-                <br />
-                Secure Service Management Portal
-              </p>
-
+            <div style={styles.divider}>
+              <div style={styles.dividerLine} />
+              <span style={styles.dividerText}>
+                New Customer?
+              </span>
+              <div style={styles.dividerLine} />
             </div>
+
+            <button
+              type="button"
+              onClick={() => router.push("/register")}
+              style={styles.register}
+            >
+              Create an Account
+            </button>
+
+            <div style={styles.footer}>
+              Aerospace Computers · Aerospace OS
+              <br />
+              Secure Service Management Portal
+            </div>
+
           </div>
-        </div>
+        </section>
       </div>
+
+      {/* RESPONSIVE STYLE */}
+      <style jsx>{`
+        @media (max-width: 800px) {
+          main {
+            padding: 20px !important;
+          }
+
+          main > div {
+            display: block !important;
+            min-height: auto !important;
+          }
+
+          main > div > section:first-child {
+            display: none !important;
+          }
+
+          main > div > section:last-child {
+            padding: 40px 24px !important;
+          }
+        }
+
+        input:focus {
+          border-color: #087bc1 !important;
+          background: #ffffff !important;
+          box-shadow: 0 0 0 4px rgba(8, 123, 193, 0.1);
+        }
+
+        button:hover:not(:disabled) {
+          transform: translateY(-1px);
+        }
+
+        button {
+          transition: all 0.2s ease;
+        }
+      `}</style>
     </main>
   );
 }
