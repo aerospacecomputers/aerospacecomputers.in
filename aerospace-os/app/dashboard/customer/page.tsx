@@ -219,8 +219,7 @@ export default function CustomerDashboard() {
   const [timeDraft, setTimeDraft] = useState("09:00");
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [dateDraft, setDateDraft] = useState("");
-  const [showTimePicker, setShowTimePicker] = useState(false);
-  const [timeDraft, setTimeDraft] = useState("09:00");
+
 
   useEffect(() => {
     async function loadProfile() {
