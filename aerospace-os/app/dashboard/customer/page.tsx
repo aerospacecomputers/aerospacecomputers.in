@@ -215,6 +215,8 @@ export default function CustomerDashboard() {
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<string[]>([]);
   const [requests, setRequests] = useState<CustomerRequest[]>([]);
   const [selectedRequest, setSelectedRequest] = useState<CustomerRequest | null>(null);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [timeDraft, setTimeDraft] = useState("09:00");
 
   useEffect(() => {
     async function loadProfile() {
@@ -724,6 +726,45 @@ export default function CustomerDashboard() {
             </PageHeader>
           )}
 
+          {showTimePicker && (
+            <div className="modalBackdrop" onClick={() => setShowTimePicker(false)}>
+              <div className="timePickerModal" onClick={(event) => event.stopPropagation()}>
+                <div className="modalHeader">
+                  <div>
+                    <span>PREFERRED TIME</span>
+                    <h2>Select Time</h2>
+                    <p>Choose the preferred service time.</p>
+                  </div>
+                  <button className="modalClose" onClick={() => setShowTimePicker(false)}>×</button>
+                </div>
+
+                <div className="timePickerBody">
+                  <input
+                    className="timePickerInput"
+                    type="time"
+                    value={timeDraft}
+                    onChange={(event) => setTimeDraft(event.target.value)}
+                  />
+                </div>
+
+                <div className="modalFooter">
+                  <button className="cancelButton" onClick={() => setShowTimePicker(false)}>
+                    Cancel
+                  </button>
+                  <button
+                    className="submitButton"
+                    onClick={() => {
+                      setPreferredTime(timeDraft);
+                      setShowTimePicker(false);
+                    }}
+                  >
+                    OK
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {selectedRequest && (
             <div className="modalBackdrop" onClick={() => setSelectedRequest(null)}>
               <div className="requestModal" onClick={(event) => event.stopPropagation()}>
@@ -910,9 +951,14 @@ export default function CustomerDashboard() {
                     <label>
                       Preferred Time
                       <input
-                        type="time"
-                        value={preferredTime}
-                        onChange={(e) => setPreferredTime(e.target.value)}
+                        type="text"
+                        value={preferredTime ? preferredTime.slice(0, 5) : ""}
+                        placeholder="Select time"
+                        readOnly
+                        onClick={() => {
+                          setTimeDraft(preferredTime || "09:00");
+                          setShowTimePicker(true);
+                        }}
                       />
                     </label>
 
@@ -2140,9 +2186,9 @@ export default function CustomerDashboard() {
           border: 1px solid #dbe4ec;
           background: white;
           color: #60758a;
-          border-radius: 6px;
-          padding: 10px 16px;
-          font-size: 10px;
+          border-radius: 7px;
+          padding: 12px 20px;
+          font-size: 12px;
           font-weight: 700;
           cursor: pointer;
         }
@@ -2151,9 +2197,9 @@ export default function CustomerDashboard() {
           border: 0;
           background: #0876c5;
           color: white;
-          border-radius: 6px;
-          padding: 10px 17px;
-          font-size: 10px;
+          border-radius: 7px;
+          padding: 12px 22px;
+          font-size: 12px;
           font-weight: 700;
           cursor: pointer;
         }
@@ -2219,6 +2265,9 @@ export default function CustomerDashboard() {
         }
 
 
+        .timePickerModal { width:min(430px,100%); background:#fff; border-radius:14px; box-shadow:0 22px 70px rgba(11,48,82,.24); overflow:hidden; }
+        .timePickerBody { padding:28px 26px; }
+        .timePickerInput { width:100%; height:56px; border:1px solid #dbe5ee; border-radius:9px; padding:0 14px; color:#29445e; background:#fbfdff; font-size:18px; font-family:inherit; }
         .requestModal { width:min(620px,100%); background:#fff; border-radius:14px; box-shadow:0 22px 70px rgba(11,48,82,.24); overflow:hidden; }
         .requestModalBody { padding:24px 26px; }
         .requestDetailGrid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
