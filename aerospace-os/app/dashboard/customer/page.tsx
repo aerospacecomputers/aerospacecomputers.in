@@ -1,15 +1,115 @@
-import { redirect } from "next/navigation";
-import { getCurrentSession } from "@/lib/auth";
+"use client";
 
-export default async function CustomerDashboard() {
-  const session = await getCurrentSession();
+import { FormEvent, useEffect, useState } from "react";
 
-  if (!session) {
-    redirect("/login");
+interface ServiceRequest {
+  _id: string;
+  requestNumber: string;
+  subject: string;
+  description: string;
+  serviceType?: string;
+  preferredDate?: string | null;
+  preferredTime?: string | null;
+  status: string;
+  createdAt: string;
+}
+
+export default function CustomerDashboard() {
+  const [requests, setRequests] = useState<ServiceRequest[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+  const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+
+  const [subject, setSubject] = useState("");
+  const [description, setDescription] = useState("");
+  const [serviceType, setServiceType] = useState("");
+  const [preferredDate, setPreferredDate] = useState("");
+  const [preferredTime, setPreferredTime] = useState("");
+
+  async function loadRequests() {
+    try {
+      const response = await fetch("/api/service-requests", {
+        method: "GET",
+        cache: "no-store",
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setError(data.message || "Failed to load requests");
+        return;
+      }
+
+      setRequests(data.requests || []);
+    } catch {
+      setError("Unable to connect to the server");
+    } finally {
+      setLoading(false);
+    }
   }
 
-  if (session.role !== "customer") {
-    redirect("/login");
+  useEffect(() => {
+    loadRequests();
+  }, []);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    setSubmitting(true);
+    setMessage("");
+    setError("");
+
+    try {
+      const response = await fetch("/api/service-requests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subject,
+          description,
+          serviceType,
+          preferredDate: preferredDate || null,
+          preferredTime: preferredTime || null,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setError(data.message || "Failed to submit request");
+        return;
+      }
+
+      setMessage(
+        `Request submitted successfully. Request ID: ${data.request.requestNumber}`
+      );
+
+      setSubject("");
+      setDescription("");
+      setServiceType("");
+      setPreferredDate("");
+      setPreferredTime("");
+
+      await loadRequests();
+    } catch {
+      setError("Unable to submit request");
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  async function logout() {
+    await fetch("/api/auth/logout", {
+      method: "POST",
+    });
+
+    window.location.href = "/login";
+  }
+
+  function statusLabel(status: string) {
+    return status.replaceAll("_", " ");
   }
 
   return (
@@ -27,212 +127,242 @@ export default async function CustomerDashboard() {
             </p>
           </div>
 
-          <form action="/api/auth/logout" method="POST">
-            <button
-              type="submit"
-              className="rounded-lg border border-slate-700 px-4 py-2 text-sm text-slate-300 hover:bg-slate-800"
-            >
-              Logout
-            </button>
-          </form>
+          <button
+            onClick={logout}
+            className="rounded-lg border border-slate-700 px-4 py-2 text-sm font-medium text-slate-200 hover:bg-slate-800"
+          >
+            Logout
+          </button>
         </div>
       </header>
 
-      {/* Dashboard */}
       <div className="mx-auto max-w-7xl px-6 py-8">
-
         {/* Welcome */}
         <section className="mb-8">
           <h2 className="text-3xl font-bold">
-            Welcome to Aerospace OS
+            IT Service Center
           </h2>
 
           <p className="mt-2 text-slate-400">
-            Manage your services, devices, requests and support.
+            Submit a service request and track its progress from here.
           </p>
         </section>
 
-        {/* Quick Actions */}
-        <section className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+        {/* Messages */}
+        {message && (
+          <div className="mb-6 rounded-lg border border-green-700 bg-green-950/40 p-4 text-green-300">
+            {message}
+          </div>
+        )}
 
-          <DashboardCard
-            title="Service Requests"
-            description="Submit and track IT service requests."
-            value="0"
-          />
+        {error && (
+          <div className="mb-6 rounded-lg border border-red-700 bg-red-950/40 p-4 text-red-300">
+            {error}
+          </div>
+        )}
 
-          <DashboardCard
-            title="Devices & Assets"
-            description="View your registered devices and equipment."
-            value="0"
-          />
-
-          <DashboardCard
-            title="Upcoming Service"
-            description="View your upcoming scheduled services."
-            value="0"
-          />
-
-          <DashboardCard
-            title="Open Tickets"
-            description="Track active service tickets."
-            value="0"
-          />
-
-        </section>
-
-        {/* Customer Information */}
-        <section className="mt-8 grid gap-6 lg:grid-cols-2">
-
-          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            <h3 className="text-lg font-semibold">
-              Customer Information
+        <div className="grid gap-8 lg:grid-cols-2">
+          {/* Submit Request */}
+          <section className="rounded-xl border border-slate-800 bg-slate-900 p-6">
+            <h3 className="text-xl font-semibold">
+              Submit IT Service Request
             </h3>
 
-            <div className="mt-5 space-y-4 text-sm">
-
-              <InfoRow
-                label="Account Type"
-                value="Customer"
-              />
-
-              <InfoRow
-                label="Customer ID"
-                value={session.userId}
-              />
-
-              <InfoRow
-                label="Company"
-                value="Not assigned"
-              />
-
-              <InfoRow
-                label="Status"
-                value="Active"
-              />
-
-            </div>
-          </div>
-
-          <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-            <h3 className="text-lg font-semibold">
-              Quick Actions
-            </h3>
-
-            <div className="mt-5 grid gap-3">
-
-              <a
-                href="/service-requests/new"
-                className="rounded-xl bg-blue-600 px-5 py-4 font-semibold hover:bg-blue-500"
-              >
-                + Submit Service Request
-              </a>
-
-              <a
-                href="/service-requests"
-                className="rounded-xl border border-slate-700 px-5 py-4 font-semibold hover:bg-slate-800"
-              >
-                View My Requests
-              </a>
-
-              <a
-                href="/assets"
-                className="rounded-xl border border-slate-700 px-5 py-4 font-semibold hover:bg-slate-800"
-              >
-                View Devices & Assets
-              </a>
-
-            </div>
-          </div>
-
-        </section>
-
-        {/* Recent Requests */}
-        <section className="mt-8 rounded-2xl border border-slate-800 bg-slate-900 p-6">
-
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold">
-                Recent Service Requests
-              </h3>
-
-              <p className="mt-1 text-sm text-slate-400">
-                Your latest service requests will appear here.
-              </p>
-            </div>
-
-            <a
-              href="/service-requests"
-              className="text-sm font-medium text-blue-400 hover:text-blue-300"
-            >
-              View all
-            </a>
-          </div>
-
-          <div className="mt-6 rounded-xl border border-dashed border-slate-700 p-8 text-center">
-
-            <p className="text-slate-400">
-              No service requests yet.
+            <p className="mt-1 text-sm text-slate-400">
+              Tell us what you need help with.
             </p>
 
-            <a
-              href="/service-requests/new"
-              className="mt-4 inline-block rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold hover:bg-blue-500"
+            <form
+              onSubmit={handleSubmit}
+              className="mt-6 space-y-5"
             >
-              Submit your first request
-            </a>
+              <div>
+                <label className="mb-2 block text-sm font-medium">
+                  Subject
+                </label>
 
-          </div>
+                <input
+                  type="text"
+                  value={subject}
+                  onChange={(e) => setSubject(e.target.value)}
+                  placeholder="Example: Laptop not starting"
+                  required
+                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
+                />
+              </div>
 
-        </section>
+              <div>
+                <label className="mb-2 block text-sm font-medium">
+                  Service Type
+                </label>
 
+                <select
+                  value={serviceType}
+                  onChange={(e) => setServiceType(e.target.value)}
+                  className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
+                >
+                  <option value="">Select service</option>
+                  <option value="Computer / Laptop">
+                    Computer / Laptop
+                  </option>
+                  <option value="Server">
+                    Server
+                  </option>
+                  <option value="Networking">
+                    Networking
+                  </option>
+                  <option value="CCTV">
+                    CCTV
+                  </option>
+                  <option value="Printer">
+                    Printer
+                  </option>
+                  <option value="UPS">
+                    UPS
+                  </option>
+                  <option value="Software">
+                    Software
+                  </option>
+                  <option value="Other">
+                    Other
+                  </option>
+                </select>
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium">
+                  Describe the Problem
+                </label>
+
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  placeholder="Describe the issue or service you require..."
+                  required
+                  rows={5}
+                  className="w-full resize-none rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
+                />
+              </div>
+
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    Preferred Date
+                  </label>
+
+                  <input
+                    type="date"
+                    value={preferredDate}
+                    onChange={(e) =>
+                      setPreferredDate(e.target.value)
+                    }
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="mb-2 block text-sm font-medium">
+                    Preferred Time
+                  </label>
+
+                  <input
+                    type="time"
+                    value={preferredTime}
+                    onChange={(e) =>
+                      setPreferredTime(e.target.value)
+                    }
+                    className="w-full rounded-lg border border-slate-700 bg-slate-950 px-4 py-3 text-white outline-none focus:border-blue-500"
+                  />
+                </div>
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="w-full rounded-lg bg-blue-600 px-5 py-3 font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                {submitting
+                  ? "Submitting..."
+                  : "Submit Service Request"}
+              </button>
+            </form>
+          </section>
+
+          {/* Request Status */}
+          <section className="rounded-xl border border-slate-800 bg-slate-900 p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-xl font-semibold">
+                  My Service Requests
+                </h3>
+
+                <p className="mt-1 text-sm text-slate-400">
+                  Track requests submitted by you.
+                </p>
+              </div>
+
+              <button
+                onClick={loadRequests}
+                className="rounded-lg border border-slate-700 px-3 py-2 text-sm hover:bg-slate-800"
+              >
+                Refresh
+              </button>
+            </div>
+
+            <div className="mt-6 space-y-4">
+              {loading ? (
+                <div className="rounded-lg border border-slate-800 p-5 text-center text-slate-400">
+                  Loading requests...
+                </div>
+              ) : requests.length === 0 ? (
+                <div className="rounded-lg border border-dashed border-slate-700 p-8 text-center text-slate-400">
+                  No service requests yet.
+                </div>
+              ) : (
+                requests.map((request) => (
+                  <div
+                    key={request._id}
+                    className="rounded-lg border border-slate-800 bg-slate-950 p-5"
+                  >
+                    <div className="flex flex-wrap items-start justify-between gap-3">
+                      <div>
+                        <p className="text-xs font-medium text-blue-400">
+                          {request.requestNumber}
+                        </p>
+
+                        <h4 className="mt-1 font-semibold">
+                          {request.subject}
+                        </h4>
+                      </div>
+
+                      <span className="rounded-full bg-blue-950 px-3 py-1 text-xs font-medium capitalize text-blue-300">
+                        {statusLabel(request.status)}
+                      </span>
+                    </div>
+
+                    <p className="mt-3 text-sm text-slate-400">
+                      {request.description}
+                    </p>
+
+                    {request.serviceType && (
+                      <p className="mt-3 text-xs text-slate-500">
+                        Service: {request.serviceType}
+                      </p>
+                    )}
+
+                    <p className="mt-2 text-xs text-slate-500">
+                      Submitted:{" "}
+                      {new Date(
+                        request.createdAt
+                      ).toLocaleString()}
+                    </p>
+                  </div>
+                ))
+              )}
+            </div>
+          </section>
+        </div>
       </div>
     </main>
-  );
-}
-
-function DashboardCard({
-  title,
-  description,
-  value,
-}: {
-  title: string;
-  description: string;
-  value: string;
-}) {
-  return (
-    <div className="rounded-2xl border border-slate-800 bg-slate-900 p-6">
-      <div className="text-3xl font-bold text-blue-400">
-        {value}
-      </div>
-
-      <h3 className="mt-3 font-semibold">
-        {title}
-      </h3>
-
-      <p className="mt-2 text-sm leading-6 text-slate-400">
-        {description}
-      </p>
-    </div>
-  );
-}
-
-function InfoRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
-  return (
-    <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-      <span className="text-slate-400">
-        {label}
-      </span>
-
-      <span className="max-w-[60%] truncate text-right text-slate-200">
-        {value}
-      </span>
-    </div>
   );
 }
