@@ -2319,15 +2319,88 @@ function QuickAction({
   onClick: () => void;
 }) {
   return (
-    <button className="quick" onClick={onClick}>
-      <div className="quickIcon"><Icon name={icon} size={16} /></div>
+    <button
+      className="quick"
+      onClick={onClick}
+      style={{
+        width: "100%",
+        minHeight: "78px",
+        border: "1px solid #d6e3ee",
+        background: "#ffffff",
+        borderRadius: "10px",
+        padding: "11px 12px",
+        display: "flex",
+        alignItems: "center",
+        gap: "11px",
+        textAlign: "left",
+        cursor: "pointer",
+        boxSizing: "border-box",
+        color: "#173a5b",
+      }}
+    >
+      <span
+        className="quickIcon"
+        style={{
+          width: "38px",
+          height: "38px",
+          minWidth: "38px",
+          borderRadius: "9px",
+          background: "#e8f4fd",
+          color: "#0876c5",
+          display: "grid",
+          placeItems: "center",
+          fontSize: "17px",
+          fontWeight: 700,
+        }}
+      >
+        <Icon name={icon} size={17} />
+      </span>
 
-      <div>
-        <strong>{title}</strong>
-        <span>{text}</span>
-      </div>
+      <span
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "flex-start",
+          justifyContent: "center",
+          flex: 1,
+          minWidth: 0,
+          textAlign: "left",
+        }}
+      >
+        <strong
+          style={{
+            display: "block",
+            color: "#173a5b",
+            fontSize: "12px",
+            fontWeight: 800,
+            marginBottom: "4px",
+          }}
+        >
+          {title}
+        </strong>
+        <span
+          style={{
+            display: "block",
+            color: "#718499",
+            fontSize: "10px",
+            lineHeight: 1.35,
+          }}
+        >
+          {text}
+        </span>
+      </span>
 
-      <b><Icon name="arrow" size={14} /></b>
+      <span
+        style={{
+          marginLeft: "auto",
+          color: "#0876c5",
+          fontSize: "20px",
+          fontWeight: 700,
+          lineHeight: 1,
+        }}
+      >
+        <Icon name="arrow" size={16} />
+      </span>
     </button>
   );
 }
