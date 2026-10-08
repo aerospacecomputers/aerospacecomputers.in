@@ -923,6 +923,7 @@ export default function CustomerDashboard() {
                             <input
                               type="date"
                               value={dateDraft}
+                              onClick={(event) => event.currentTarget.showPicker?.()}
                               onChange={(event) => setDateDraft(event.target.value)}
                             />
                             <button
@@ -942,16 +943,40 @@ export default function CustomerDashboard() {
 
                     <label>
                       Preferred Time
-                      <input
-                        type="text"
-                        value={preferredTime ? preferredTime.slice(0, 5) : ""}
-                        placeholder="Select time"
-                        readOnly
-                        onClick={() => {
-                          setTimeDraft(preferredTime || "09:00");
-                          setShowTimePicker(true);
-                        }}
-                      />
+                      <div className="pickerField">
+                        <input
+                          type="text"
+                          value={preferredTime ? preferredTime.slice(0, 5) : ""}
+                          placeholder="Select time"
+                          readOnly
+                          onClick={() => {
+                            setTimeDraft(preferredTime || "09:00");
+                            setShowTimePicker(true);
+                            setShowDatePicker(false);
+                          }}
+                        />
+                        {showTimePicker && (
+                          <div className="inlinePicker" onClick={(event) => event.stopPropagation()}>
+                            <div className="inlinePickerTitle">Select preferred time</div>
+                            <input
+                              type="time"
+                              value={timeDraft}
+                              onClick={(event) => event.currentTarget.showPicker?.()}
+                              onChange={(event) => setTimeDraft(event.target.value)}
+                            />
+                            <button
+                              type="button"
+                              className="inlinePickerOk"
+                              onClick={() => {
+                                setPreferredTime(timeDraft);
+                                setShowTimePicker(false);
+                              }}
+                            >
+                              OK
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </label>
 
                     <label className="full">
