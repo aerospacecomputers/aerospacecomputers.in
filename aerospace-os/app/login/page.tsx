@@ -8,6 +8,8 @@ export default function LoginPage() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -52,10 +54,13 @@ export default function LoginPage() {
 
   return (
     <main className="loginPage">
+
+      {/* CENTER LOGIN WINDOW */}
       <div className="loginWindow">
 
         {/* LEFT BRANDING PANEL */}
         <section className="brandPanel">
+
           <div className="brandContent">
 
             <img
@@ -82,10 +87,12 @@ export default function LoginPage() {
             </p>
 
           </div>
+
         </section>
 
         {/* RIGHT LOGIN PANEL */}
         <section className="loginPanel">
+
           <div className="loginContent">
 
             <div className="osBadge">
@@ -105,6 +112,7 @@ export default function LoginPage() {
 
               {/* EMAIL */}
               <div className="field">
+
                 <label htmlFor="email">
                   Email Address
                 </label>
@@ -125,6 +133,7 @@ export default function LoginPage() {
                         height="14"
                         rx="2"
                       />
+
                       <path d="M3 7l9 6 9-6" />
                     </svg>
                   </span>
@@ -142,10 +151,12 @@ export default function LoginPage() {
                   />
 
                 </div>
+
               </div>
 
               {/* PASSWORD */}
               <div className="field">
+
                 <label htmlFor="password">
                   Password
                 </label>
@@ -166,13 +177,18 @@ export default function LoginPage() {
                         height="10"
                         rx="2"
                       />
+
                       <path d="M8 10V7a4 4 0 018 0v3" />
                     </svg>
                   </span>
 
                   <input
                     id="password"
-                    type="password"
+                    type={
+                      showPassword
+                        ? "text"
+                        : "password"
+                    }
                     value={password}
                     onChange={(event) =>
                       setPassword(event.target.value)
@@ -182,10 +198,59 @@ export default function LoginPage() {
                     autoComplete="current-password"
                   />
 
+                  {/* PASSWORD VIEW / HIDE */}
+                  <button
+                    type="button"
+                    className="passwordToggle"
+                    onClick={() =>
+                      setShowPassword(!showPassword)
+                    }
+                    aria-label={
+                      showPassword
+                        ? "Hide password"
+                        : "Show password"
+                    }
+                  >
+                    {showPassword ? (
+                      /* EYE OFF */
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                      >
+                        <path d="M3 3l18 18" />
+
+                        <path d="M10.6 10.6a2 2 0 102.8 2.8" />
+
+                        <path d="M9.9 5.1A10.8 10.8 0 0112 4.9c5.5 0 9 5.1 9 7.1a7.7 7.7 0 01-2.3 3.4" />
+
+                        <path d="M6.2 6.3C3.8 7.8 3 10.3 3 12c0 2 3.5 7.1 9 7.1a10.7 10.7 0 004.1-.8" />
+                      </svg>
+                    ) : (
+                      /* EYE */
+                      <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.8"
+                      >
+                        <path d="M2.5 12s3.5-7 9.5-7 9.5 7 9.5 7-3.5 7-9.5 7-9.5-7-9.5-7z" />
+
+                        <circle
+                          cx="12"
+                          cy="12"
+                          r="2.8"
+                        />
+                      </svg>
+                    )}
+                  </button>
+
                 </div>
+
               </div>
 
-              {/* ERROR MESSAGE */}
+              {/* ERROR */}
               {error && (
                 <div className="errorBox">
                   {error}
@@ -198,7 +263,9 @@ export default function LoginPage() {
                 className="signInButton"
                 disabled={loading}
               >
-                {loading ? "Signing In..." : "Sign In"}
+                {loading
+                  ? "Signing In..."
+                  : "Sign In"}
 
                 {!loading && (
                   <span className="arrow">
@@ -211,6 +278,7 @@ export default function LoginPage() {
 
             {/* REGISTER DIVIDER */}
             <div className="divider">
+
               <div />
 
               <span>
@@ -218,13 +286,16 @@ export default function LoginPage() {
               </span>
 
               <div />
+
             </div>
 
             {/* CREATE ACCOUNT */}
             <button
               type="button"
               className="registerButton"
-              onClick={() => router.push("/register")}
+              onClick={() =>
+                router.push("/register")
+              }
             >
               Create an Account
             </button>
@@ -237,6 +308,7 @@ export default function LoginPage() {
             </div>
 
           </div>
+
         </section>
 
       </div>
@@ -272,13 +344,13 @@ export default function LoginPage() {
           background:
             radial-gradient(
               circle at 18% 20%,
-              rgba(255, 255, 255, 0.95) 0%,
-              rgba(255, 255, 255, 0) 32%
+              rgba(255,255,255,0.95) 0%,
+              rgba(255,255,255,0) 32%
             ),
             radial-gradient(
               circle at 85% 75%,
-              rgba(255, 255, 255, 0.7) 0%,
-              rgba(255, 255, 255, 0) 30%
+              rgba(255,255,255,0.7) 0%,
+              rgba(255,255,255,0) 30%
             ),
             linear-gradient(
               135deg,
@@ -287,8 +359,6 @@ export default function LoginPage() {
               #eaf8ff 100%
             );
         }
-
-        /* Very subtle background glow */
 
         .loginPage::before {
           content: "";
@@ -337,7 +407,7 @@ export default function LoginPage() {
         }
 
         /* ================================
-           MAIN LOGIN WINDOW
+           LOGIN WINDOW
            ================================ */
 
         .loginWindow {
@@ -357,13 +427,13 @@ export default function LoginPage() {
 
           border-radius: 24px;
 
-          background: rgba(255, 255, 255, 0.97);
+          background: rgba(255,255,255,0.97);
 
-          border: 1px solid rgba(255, 255, 255, 0.95);
+          border: 1px solid rgba(255,255,255,0.95);
 
           box-shadow:
-            0 30px 80px rgba(28, 79, 111, 0.16),
-            0 8px 25px rgba(28, 79, 111, 0.08);
+            0 30px 80px rgba(28,79,111,0.16),
+            0 8px 25px rgba(28,79,111,0.08);
         }
 
         /* ================================
@@ -544,7 +614,7 @@ export default function LoginPage() {
         }
 
         /* ================================
-           FORM FIELDS
+           FORM
            ================================ */
 
         .field {
@@ -604,7 +674,7 @@ export default function LoginPage() {
 
           padding:
             0
-            15px
+            50px
             0
             48px;
 
@@ -628,7 +698,55 @@ export default function LoginPage() {
 
           box-shadow:
             0 0 0 4px
-            rgba(8, 137, 210, 0.09);
+            rgba(8,137,210,0.09);
+        }
+
+        /* ================================
+           PASSWORD VIEW / HIDE
+           ================================ */
+
+        .passwordToggle {
+          position: absolute;
+
+          right: 10px;
+
+          top: 50%;
+
+          transform: translateY(-50%);
+
+          width: 32px;
+
+          height: 32px;
+
+          display: flex;
+
+          align-items: center;
+
+          justify-content: center;
+
+          border: none;
+
+          background: transparent;
+
+          color: #71859b;
+
+          cursor: pointer;
+
+          padding: 0;
+
+          border-radius: 6px;
+        }
+
+        .passwordToggle:hover {
+          color: #087cca;
+
+          background: #eef8ff;
+        }
+
+        .passwordToggle svg {
+          width: 19px;
+
+          height: 19px;
         }
 
         /* ================================
@@ -681,7 +799,7 @@ export default function LoginPage() {
 
           box-shadow:
             0 9px 22px
-            rgba(8, 120, 194, 0.22);
+            rgba(8,120,194,0.22);
 
           transition:
             transform 0.2s ease,
@@ -693,7 +811,7 @@ export default function LoginPage() {
 
           box-shadow:
             0 12px 28px
-            rgba(8, 120, 194, 0.28);
+            rgba(8,120,194,0.28);
         }
 
         .signInButton:disabled {
@@ -819,6 +937,7 @@ export default function LoginPage() {
           .loginContent h1 {
             font-size: 34px;
           }
+
         }
 
         /* ================================
@@ -866,6 +985,7 @@ export default function LoginPage() {
           .loginContent h1 {
             font-size: 34px;
           }
+
         }
 
       `}</style>
