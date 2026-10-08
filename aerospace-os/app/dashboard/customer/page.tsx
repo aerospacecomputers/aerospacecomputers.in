@@ -88,7 +88,7 @@ const requests = [
   },
 ];
 
-const assets = [
+const assets: {\n  name: string;\n  type: string;\n  icon: IconName;\n  serial: string;\n  location: string;\n  status: string;\n}[] = [
   {
     name: "Dell Latitude 5420",
     type: "Laptop",
