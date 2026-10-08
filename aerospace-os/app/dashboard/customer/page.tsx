@@ -1506,13 +1506,13 @@ export default function CustomerDashboard() {
         .sideCard h2 {
           margin: 0;
           color: #173858;
-          font-size: 14px;
+          font-size: 18px;
         }
 
         .cardHeader p {
-          margin: 4px 0 0;
-          color: #8c9baa;
-          font-size: 9px;
+          margin: 5px 0 0;
+          color: #6f8295;
+          font-size: 12px;
         }
 
         .viewAll {
@@ -1680,10 +1680,10 @@ export default function CustomerDashboard() {
 
         .emptyAssets {
           grid-column: 1 / -1;
-          padding: 28px 18px;
+          padding: 32px 18px;
           text-align: center;
-          color: #7d90a2;
-          font-size: 11px;
+          color: #62788d;
+          font-size: 13px;
           border: 1px dashed #d7e3ec;
           border-radius: 10px;
           background: #fbfdff;
