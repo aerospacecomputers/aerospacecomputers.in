@@ -1223,22 +1223,42 @@ export default function CustomerDashboard() {
         }
 
         .stat {
+          position: relative;
           background: white;
           border: 1px solid #e3ebf2;
-          border-radius: 10px;
-          padding: 15px;
+          border-radius: 12px;
+          padding: 13px 14px;
           display: flex;
           align-items: center;
           gap: 11px;
+          min-height: 72px;
+          overflow: hidden;
+          box-shadow: 0 3px 12px rgba(28, 63, 94, 0.05);
         }
 
-        .statIcon {
-          width: 39px;
-          height: 39px;
+        .stat::after {
+          content: "";
+          position: absolute;
+          right: -18px;
+          bottom: -22px;
+          width: 64px;
+          height: 64px;
           border-radius: 50%;
+          opacity: 0.35;
+        }
+
+        .stat.blue::after { background: #d9edff; }
+        .stat.orange::after { background: #ffe8c7; }
+        .stat.purple::after { background: #e9e1ff; }
+        .stat.green::after { background: #d9f5e5; }
+
+        .statIcon {
+          width: 42px;
+          height: 42px;
+          flex: 0 0 42px;
+          border-radius: 12px;
           display: grid;
           place-items: center;
-          font-size: 17px;
         }
 
         .statIcon.blue {
@@ -1261,17 +1281,35 @@ export default function CustomerDashboard() {
           color: #1ca45d;
         }
 
+        .statContent {
+          position: relative;
+          z-index: 1;
+        }
+
         .stat span {
           display: block;
           color: #647a90;
           font-size: 10px;
+          font-weight: 700;
+          text-transform: capitalize;
+          letter-spacing: 0.1px;
         }
 
         .stat strong {
-          display: block;
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-width: 34px;
+          height: 28px;
+          padding: 0 9px;
+          margin-top: 5px;
+          border-radius: 8px;
+          background: #f3f7fb;
           color: #173a5b;
-          font-size: 22px;
-          margin-top: 3px;
+          font-size: 19px;
+          line-height: 1;
+          font-weight: 800;
+          box-shadow: inset 0 0 0 1px #e6edf3;
         }
 
         /* CARDS */
@@ -2171,16 +2209,18 @@ function Stat({
   value,
   type,
 }: {
-  icon: string;
+  icon: IconName;
   title: string;
   value: string;
   type: string;
 }) {
   return (
-    <div className="stat">
-      <div className={`statIcon ${type}`}>{icon}</div>
+    <div className={`stat ${type}`}>
+      <div className={`statIcon ${type}`}>
+        <Icon name={icon} size={18} />
+      </div>
 
-      <div>
+      <div className="statContent">
         <span>{title}</span>
         <strong>{value}</strong>
       </div>
