@@ -88,7 +88,14 @@ const requests = [
   },
 ];
 
-const assets: {\n  name: string;\n  type: string;\n  icon: IconName;\n  serial: string;\n  location: string;\n  status: string;\n}[] = [
+const assets: {
+  name: string;
+  type: string;
+  icon: IconName;
+  serial: string;
+  location: string;
+  status: string;
+}[] = [
   {
     name: "Dell Latitude 5420",
     type: "Laptop",
