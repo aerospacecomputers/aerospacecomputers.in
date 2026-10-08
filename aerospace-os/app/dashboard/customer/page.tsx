@@ -148,7 +148,11 @@ export default function CustomerDashboard() {
   const [subject, setSubject] = useState("");
   const [service, setService] = useState("");
   const [description, setDescription] = useState("");
+  const [preferredDate, setPreferredDate] = useState("");
+  const [preferredTime, setPreferredTime] = useState("");
   const [submitted, setSubmitted] = useState(false);
+  const [requestError, setRequestError] = useState("");
+  const [submittingRequest, setSubmittingRequest] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
   const [profile, setProfile] = useState({ name: "", email: "", phone: "", address: "" });
   const [profileDraft, setProfileDraft] = useState(profile);
@@ -193,9 +197,48 @@ export default function CustomerDashboard() {
     window.location.href = "/api/auth/logout";
   }
 
-  function submitRequest(e: React.FormEvent) {
+  async function submitRequest(e: React.FormEvent) {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitted(false);
+    setRequestError("");
+    setSubmittingRequest(true);
+
+    try {
+      const response = await fetch("/api/service-requests", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          subject,
+          serviceType: service,
+          description,
+          preferredDate: preferredDate || null,
+          preferredTime: preferredTime || null,
+          deviceIds: [],
+          attachmentUrls: [],
+        }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setRequestError(data.message || "Failed to submit service request");
+        return;
+      }
+
+      setSubmitted(true);
+      setSubject("");
+      setService("");
+      setDescription("");
+      setPreferredDate("");
+      setPreferredTime("");
+    } catch (error) {
+      console.error("Failed to submit service request:", error);
+      setRequestError("Failed to submit service request");
+    } finally {
+      setSubmittingRequest(false);
+    }
   }
 
   function openProfileEditor() {
@@ -656,6 +699,12 @@ export default function CustomerDashboard() {
                 </div>
               )}
 
+              {requestError && (
+                <div className="error">
+                  {requestError}
+                </div>
+              )}
+
               <section className="card formCard">
                 <form onSubmit={submitRequest}>
                   <div className="formGrid">
@@ -692,12 +741,20 @@ export default function CustomerDashboard() {
 
                     <label>
                       Preferred Date
-                      <input type="date" />
+                      <input
+                        type="date"
+                        value={preferredDate}
+                        onChange={(e) => setPreferredDate(e.target.value)}
+                      />
                     </label>
 
                     <label>
                       Preferred Time
-                      <input type="time" />
+                      <input
+                        type="time"
+                        value={preferredTime}
+                        onChange={(e) => setPreferredTime(e.target.value)}
+                      />
                     </label>
 
                     <label className="full">
@@ -721,8 +778,12 @@ export default function CustomerDashboard() {
                       Cancel
                     </button>
 
-                    <button className="submitButton" type="submit">
-                      Submit Service Request →
+                    <button
+                      className="submitButton"
+                      type="submit"
+                      disabled={submittingRequest}
+                    >
+                      {submittingRequest ? "Submitting..." : "Submit Service Request →"}
                     </button>
                   </div>
                 </form>
