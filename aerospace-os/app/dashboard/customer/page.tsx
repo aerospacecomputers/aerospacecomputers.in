@@ -690,17 +690,35 @@ export default function CustomerDashboard() {
                 </div>
 
                 <div className="largeAssetGrid">
-                  {assets.map((asset) => (
-                    <AssetCard
-                      key={asset.serial}
-                      asset={asset}
-                      onRequest={() => {
-                        setSubject(`${asset.name} Service Request`);
-                        setService(asset.type);
-                        setPage("new-request");
-                      }}
-                    />
-                  ))}
+                  {devices.length > 0 ? (
+                    devices.map((device) => (
+                      <AssetCard
+                        key={device._id}
+                        asset={{
+                          id: device._id,
+                          name:
+                            device.name ||
+                            [device.brand, device.model].filter(Boolean).join(" ") ||
+                            "Unnamed Asset",
+                          type: deviceTypeLabel(device.deviceType),
+                          icon: deviceIcon(device.deviceType),
+                          serial: device.serialNumber || "Not provided",
+                          location: device.location || "Location not provided",
+                          status: device.active === false ? "Inactive" : "Active",
+                        }}
+                        onRequest={() => {
+                          setSubject(`${device.name || "Asset"} Service Request`);
+                          setService(deviceTypeLabel(device.deviceType));
+                          setSelectedDeviceIds([device._id]);
+                          setPage("new-request");
+                        }}
+                      />
+                    ))
+                  ) : (
+                    <div className="emptyAssets">
+                      No assets have been added to your account yet.
+                    </div>
+                  )}
                 </div>
               </section>
             </PageHeader>
