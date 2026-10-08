@@ -1284,6 +1284,10 @@ export default function CustomerDashboard() {
         .statContent {
           position: relative;
           z-index: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 5px;
+          min-width: 0;
         }
 
         .stat span {
@@ -1299,10 +1303,11 @@ export default function CustomerDashboard() {
           display: inline-flex;
           align-items: center;
           justify-content: center;
+          align-self: flex-start;
           min-width: 34px;
           height: 28px;
           padding: 0 9px;
-          margin-top: 5px;
+          margin-top: 0;
           border-radius: 8px;
           background: #f3f7fb;
           color: #173a5b;
@@ -1494,68 +1499,90 @@ export default function CustomerDashboard() {
 
         .assetCards {
           display: grid;
-          grid-template-columns: repeat(4, 1fr);
-          gap: 9px;
-          padding: 8px 17px 17px;
+          grid-template-columns: repeat(4, minmax(0, 1fr));
+          gap: 12px;
+          padding: 12px 17px 18px;
         }
 
         .assetCard {
-          border: 1px solid #e2ebf3;
-          border-radius: 8px;
-          padding: 10px;
-          background: #fcfdff;
+          min-width: 0;
+          border: 1px solid #e1eaf2;
+          border-radius: 11px;
+          padding: 12px;
+          background: #ffffff;
+          box-shadow: 0 3px 10px rgba(28, 63, 94, 0.04);
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .assetCard:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 16px rgba(28, 63, 94, 0.08);
         }
 
         .assetImage {
-          height: 65px;
-          border-radius: 6px;
-          background: linear-gradient(135deg, #edf5fb, #f8fbfe);
+          height: 52px;
+          border-radius: 9px;
+          background: linear-gradient(135deg, #edf6fd, #f7fbfe);
+          color: #14527d;
           display: grid;
           place-items: center;
-          font-size: 34px;
-          margin-bottom: 8px;
+          margin-bottom: 10px;
         }
 
         .assetTop {
           display: flex;
           justify-content: space-between;
           align-items: center;
+          gap: 6px;
         }
 
         .assetTop .status {
           font-size: 7px;
-          padding: 4px 6px;
+          padding: 4px 7px;
+          white-space: nowrap;
         }
 
         .assetCard h3 {
-          margin: 8px 0 2px;
-          color: #203f5b;
-          font-size: 10px;
+          margin: 9px 0 4px;
+          color: #173a5b;
+          font-size: 12px;
+          line-height: 1.35;
+          min-height: 32px;
         }
 
         .assetType {
-          color: #8a9bab;
-          font-size: 8px;
+          color: #5f7890;
+          font-size: 9px;
+          font-weight: 700;
         }
 
         .assetDetails {
-          margin-top: 8px;
+          margin-top: 7px;
           color: #718499;
-          font-size: 8px;
-          line-height: 1.8;
+          font-size: 9px;
+          line-height: 1.6;
+          min-height: 42px;
         }
 
         .assetRequest {
           width: 100%;
-          border: 0;
-          background: #e5f4ff;
-          color: #0873bd;
-          border-radius: 5px;
-          padding: 7px;
-          margin-top: 7px;
-          font-size: 8px;
+          border: 1px solid #0b78c8;
+          background: linear-gradient(105deg, #0876c5, #1191dd);
+          color: #ffffff;
+          border-radius: 7px;
+          padding: 8px 9px;
+          margin-top: 9px;
+          font-size: 9px;
           font-weight: 700;
+          line-height: 1.2;
           cursor: pointer;
+          box-shadow: 0 4px 10px rgba(8, 118, 197, 0.16);
+          transition: transform 0.15s ease, box-shadow 0.15s ease;
+        }
+
+        .assetRequest:hover {
+          transform: translateY(-1px);
+          box-shadow: 0 6px 14px rgba(8, 118, 197, 0.22);
         }
 
         /* RIGHT */
