@@ -2669,8 +2669,9 @@ function PageHeader({
           <p
             style={{
               margin: "5px 0 0",
-              color: "#7e90a2",
-              fontSize: "11px",
+              color: "#5f7489",
+              fontSize: "13px",
+              fontWeight: 500,
             }}
           >
             {text}
@@ -2684,9 +2685,9 @@ function PageHeader({
               border: 0,
               background: "#0876c5",
               color: "white",
-              borderRadius: "7px",
-              padding: "11px 15px",
-              fontSize: "10px",
+              borderRadius: "8px",
+              padding: "14px 20px",
+              fontSize: "12px",
               fontWeight: 700,
               cursor: "pointer",
             }}
