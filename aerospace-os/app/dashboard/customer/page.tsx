@@ -132,6 +132,18 @@ function deviceTypeLabel(type: string): string {
   return map[type.toLowerCase()] || type;
 }
 
+const categories: [IconName, string, string][] = [
+  ["laptop", "Laptops", "0"],
+  ["desktop", "Desktops", "0"],
+  ["camera", "CCTV Cameras", "0"],
+  ["printer", "Printers", "0"],
+  ["network", "Network Devices", "0"],
+  ["server", "Servers", "0"],
+  ["wifi", "Wi-Fi / AP", "0"],
+  ["power", "UPS / Power", "0"],
+  ["other", "Other", "0"],
+];
+
 export default function CustomerDashboard() {
   const [page, setPage] = useState<Page>("dashboard");
 
