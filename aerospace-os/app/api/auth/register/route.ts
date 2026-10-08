@@ -91,7 +91,9 @@ export async function POST(request: Request) {
         customerType,
         companyId: null,
         companyName:
-          customerType === "business" ? companyName : null,
+          customerType === "business"
+            ? companyName
+            : null,
         contactPerson: name,
         phone,
         email,
@@ -109,7 +111,10 @@ export async function POST(request: Request) {
       { status: 201 }
     );
   } catch (error) {
-    console.error("Customer registration error:", error);
+    console.error(
+      "Customer registration error:",
+      error
+    );
 
     return NextResponse.json(
       {
