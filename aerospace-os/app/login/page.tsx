@@ -52,84 +52,10 @@ export default function LoginPage() {
 
   return (
     <main className="loginPage">
-
-      {/* BACKGROUND DECORATION */}
-      <div className="backgroundA backgroundATop">
-        <svg viewBox="0 0 500 500" aria-hidden="true">
-          <defs>
-            <linearGradient id="aTop" x1="0%" y1="0%" x2="100%" y2="100%">
-              <stop offset="0%" stopColor="#249dd8" />
-              <stop offset="100%" stopColor="#075681" />
-            </linearGradient>
-          </defs>
-
-          <path
-            d="M105 430
-               C72 430 48 397 65 366
-               L202 112
-               C224 72 282 72 304 112
-               L455 392
-               C472 423 449 459 413 459
-               L350 459
-               C326 459 306 446 294 425
-               L250 345
-               L206 425
-               C194 446 174 459 150 459 Z
-
-               M205 265
-               L250 183
-               L295 265
-               L250 345 Z"
-            fill="url(#aTop)"
-            fillRule="evenodd"
-          />
-        </svg>
-      </div>
-
-      <div className="backgroundA backgroundABottom">
-        <svg viewBox="0 0 500 500" aria-hidden="true">
-          <defs>
-            <linearGradient
-              id="aBottom"
-              x1="0%"
-              y1="0%"
-              x2="100%"
-              y2="100%"
-            >
-              <stop offset="0%" stopColor="#40b7ee" />
-              <stop offset="100%" stopColor="#075681" />
-            </linearGradient>
-          </defs>
-
-          <path
-            d="M105 430
-               C72 430 48 397 65 366
-               L202 112
-               C224 72 282 72 304 112
-               L455 392
-               C472 423 449 459 413 459
-               L350 459
-               C326 459 306 446 294 425
-               L250 345
-               L206 425
-               C194 446 174 459 150 459 Z
-
-               M205 265
-               L250 183
-               L295 265
-               L250 345 Z"
-            fill="url(#aBottom)"
-            fillRule="evenodd"
-          />
-        </svg>
-      </div>
-
-      {/* CENTER LOGIN WINDOW */}
       <div className="loginWindow">
 
-        {/* LEFT BRANDING */}
+        {/* LEFT BRANDING PANEL */}
         <section className="brandPanel">
-
           <div className="brandContent">
 
             <img
@@ -156,12 +82,10 @@ export default function LoginPage() {
             </p>
 
           </div>
-
         </section>
 
-        {/* RIGHT LOGIN */}
+        {/* RIGHT LOGIN PANEL */}
         <section className="loginPanel">
-
           <div className="loginContent">
 
             <div className="osBadge">
@@ -181,7 +105,6 @@ export default function LoginPage() {
 
               {/* EMAIL */}
               <div className="field">
-
                 <label htmlFor="email">
                   Email Address
                 </label>
@@ -223,7 +146,6 @@ export default function LoginPage() {
 
               {/* PASSWORD */}
               <div className="field">
-
                 <label htmlFor="password">
                   Password
                 </label>
@@ -263,7 +185,7 @@ export default function LoginPage() {
                 </div>
               </div>
 
-              {/* ERROR */}
+              {/* ERROR MESSAGE */}
               {error && (
                 <div className="errorBox">
                   {error}
@@ -277,14 +199,18 @@ export default function LoginPage() {
                 disabled={loading}
               >
                 {loading ? "Signing In..." : "Sign In"}
-                {!loading && <span>→</span>}
+
+                {!loading && (
+                  <span className="arrow">
+                    →
+                  </span>
+                )}
               </button>
 
             </form>
 
             {/* REGISTER DIVIDER */}
             <div className="divider">
-
               <div />
 
               <span>
@@ -292,10 +218,9 @@ export default function LoginPage() {
               </span>
 
               <div />
-
             </div>
 
-            {/* REGISTER */}
+            {/* CREATE ACCOUNT */}
             <button
               type="button"
               className="registerButton"
@@ -304,6 +229,7 @@ export default function LoginPage() {
               Create an Account
             </button>
 
+            {/* FOOTER */}
             <div className="loginFooter">
               Aerospace Computers · Aerospace OS
               <br />
@@ -311,7 +237,6 @@ export default function LoginPage() {
             </div>
 
           </div>
-
         </section>
 
       </div>
@@ -322,11 +247,13 @@ export default function LoginPage() {
           box-sizing: border-box;
         }
 
+        /* ================================
+           PAGE BACKGROUND
+           ================================ */
+
         .loginPage {
           min-height: 100vh;
           width: 100%;
-          position: relative;
-          overflow: hidden;
 
           display: flex;
           align-items: center;
@@ -334,99 +261,120 @@ export default function LoginPage() {
 
           padding: 45px 30px;
 
-          background:
-            radial-gradient(
-              circle at 20% 20%,
-              rgba(255,255,255,0.9),
-              transparent 35%
-            ),
-            linear-gradient(
-              135deg,
-              #dff4ff 0%,
-              #bde8fb 45%,
-              #eaf8ff 100%
-            );
+          position: relative;
+          overflow: hidden;
 
           font-family:
             Arial,
             Helvetica,
             sans-serif;
+
+          background:
+            radial-gradient(
+              circle at 18% 20%,
+              rgba(255, 255, 255, 0.95) 0%,
+              rgba(255, 255, 255, 0) 32%
+            ),
+            radial-gradient(
+              circle at 85% 75%,
+              rgba(255, 255, 255, 0.7) 0%,
+              rgba(255, 255, 255, 0) 30%
+            ),
+            linear-gradient(
+              135deg,
+              #e7f7ff 0%,
+              #bdeafa 48%,
+              #eaf8ff 100%
+            );
         }
 
-        /* --------------------------------
-           BACKGROUND A SHAPES
-           -------------------------------- */
+        /* Very subtle background glow */
 
-        .backgroundA {
+        .loginPage::before {
+          content: "";
+
           position: absolute;
-          z-index: 0;
+
+          width: 650px;
+          height: 650px;
+
+          border-radius: 50%;
+
+          background:
+            radial-gradient(
+              circle,
+              rgba(255,255,255,0.45) 0%,
+              rgba(255,255,255,0) 70%
+            );
+
+          top: -300px;
+          left: -250px;
+
           pointer-events: none;
-          opacity: 0.95;
         }
 
-        .backgroundA svg {
-          width: 100%;
-          height: 100%;
-          display: block;
+        .loginPage::after {
+          content: "";
+
+          position: absolute;
+
+          width: 600px;
+          height: 600px;
+
+          border-radius: 50%;
+
+          background:
+            radial-gradient(
+              circle,
+              rgba(255,255,255,0.4) 0%,
+              rgba(255,255,255,0) 70%
+            );
+
+          bottom: -300px;
+          right: -250px;
+
+          pointer-events: none;
         }
 
-        .backgroundATop {
-          width: 430px;
-          height: 430px;
-
-          top: -230px;
-          right: -180px;
-
-          transform: rotate(8deg);
-        }
-
-        .backgroundABottom {
-          width: 450px;
-          height: 450px;
-
-          bottom: -260px;
-          left: -190px;
-
-          transform: rotate(-8deg);
-        }
-
-        /* --------------------------------
-           CENTER WINDOW
-           -------------------------------- */
+        /* ================================
+           MAIN LOGIN WINDOW
+           ================================ */
 
         .loginWindow {
           width: 100%;
           max-width: 1100px;
+
           min-height: 680px;
 
           position: relative;
           z-index: 5;
 
           display: grid;
+
           grid-template-columns: 50% 50%;
 
           overflow: hidden;
 
           border-radius: 24px;
 
-          background: rgba(255,255,255,0.96);
+          background: rgba(255, 255, 255, 0.97);
 
-          border: 1px solid rgba(255,255,255,0.9);
+          border: 1px solid rgba(255, 255, 255, 0.95);
 
           box-shadow:
-            0 30px 80px rgba(17,71,105,0.18),
-            0 5px 20px rgba(17,71,105,0.08);
+            0 30px 80px rgba(28, 79, 111, 0.16),
+            0 8px 25px rgba(28, 79, 111, 0.08);
         }
 
-        /* --------------------------------
-           LEFT SIDE
-           -------------------------------- */
+        /* ================================
+           LEFT BRAND PANEL
+           ================================ */
 
         .brandPanel {
-          position: relative;
-
           display: flex;
+
           align-items: center;
+
           justify-content: center;
 
           padding: 55px;
@@ -434,14 +382,17 @@ export default function LoginPage() {
           background:
             radial-gradient(
               circle at 50% 20%,
-              rgba(255,255,255,0.95),
-              rgba(237,249,255,0.92) 60%,
-              rgba(218,242,253,0.96)
+              #ffffff 0%,
+              #f5fbff 52%,
+              #e4f5fc 100%
             );
+
+          border-right: 1px solid #e2edf4;
         }
 
         .brandContent {
           width: 100%;
+
           max-width: 480px;
 
           text-align: center;
@@ -449,33 +400,38 @@ export default function LoginPage() {
 
         .companyLogo {
           width: 230px;
+
           max-width: 75%;
+
           height: auto;
 
-          margin: 0 auto;
-
           display: block;
+
+          margin: 0 auto;
         }
 
         .brandLine {
           width: 48px;
+
           height: 3px;
 
           margin: 24px auto 20px;
 
           border-radius: 20px;
 
-          background: linear-gradient(
-            90deg,
-            #0798df,
-            #0873ba
-          );
+          background:
+            linear-gradient(
+              90deg,
+              #0a9bdd,
+              #0874bd
+            );
         }
 
         .portalLabel {
-          color: #0782c9;
+          color: #0783ca;
 
           font-size: 12px;
+
           font-weight: 700;
 
           letter-spacing: 3px;
@@ -489,6 +445,7 @@ export default function LoginPage() {
           color: #09294e;
 
           font-size: 43px;
+
           line-height: 1.12;
 
           font-weight: 700;
@@ -510,25 +467,29 @@ export default function LoginPage() {
           color: #526b83;
 
           font-size: 15px;
+
           line-height: 1.7;
         }
 
-        /* --------------------------------
-           RIGHT SIDE
-           -------------------------------- */
+        /* ================================
+           RIGHT LOGIN PANEL
+           ================================ */
 
         .loginPanel {
           display: flex;
+
           align-items: center;
+
           justify-content: center;
 
-          background: #ffffff;
-
           padding: 55px 65px;
+
+          background: #ffffff;
         }
 
         .loginContent {
           width: 100%;
+
           max-width: 430px;
         }
 
@@ -544,6 +505,7 @@ export default function LoginPage() {
           color: #0879c2;
 
           font-size: 11px;
+
           font-weight: 700;
 
           letter-spacing: 1px;
@@ -555,6 +517,7 @@ export default function LoginPage() {
           color: #08264a;
 
           font-size: 40px;
+
           line-height: 1.1;
 
           font-weight: 700;
@@ -576,12 +539,13 @@ export default function LoginPage() {
           color: #71859b;
 
           font-size: 14px;
+
           line-height: 1.6;
         }
 
-        /* --------------------------------
-           FORM
-           -------------------------------- */
+        /* ================================
+           FORM FIELDS
+           ================================ */
 
         .field {
           margin-bottom: 19px;
@@ -595,6 +559,7 @@ export default function LoginPage() {
           color: #203650;
 
           font-size: 12px;
+
           font-weight: 700;
         }
 
@@ -606,6 +571,7 @@ export default function LoginPage() {
           position: absolute;
 
           left: 15px;
+
           top: 50%;
 
           transform: translateY(-50%);
@@ -613,6 +579,7 @@ export default function LoginPage() {
           color: #6c8298;
 
           width: 20px;
+
           height: 20px;
 
           pointer-events: none;
@@ -620,11 +587,13 @@ export default function LoginPage() {
 
         .inputIcon svg {
           width: 20px;
+
           height: 20px;
         }
 
         .inputWrapper input {
           width: 100%;
+
           height: 53px;
 
           border: 1px solid #d5e1eb;
@@ -633,7 +602,11 @@ export default function LoginPage() {
 
           background: #fbfdff;
 
-          padding: 0 15px 0 48px;
+          padding:
+            0
+            15px
+            0
+            48px;
 
           outline: none;
 
@@ -654,8 +627,13 @@ export default function LoginPage() {
           background: #ffffff;
 
           box-shadow:
-            0 0 0 4px rgba(8,137,210,0.09);
+            0 0 0 4px
+            rgba(8, 137, 210, 0.09);
         }
+
+        /* ================================
+           ERROR
+           ================================ */
 
         .errorBox {
           margin-bottom: 16px;
@@ -673,11 +651,17 @@ export default function LoginPage() {
           font-size: 13px;
         }
 
+        /* ================================
+           SIGN IN BUTTON
+           ================================ */
+
         .signInButton {
           width: 100%;
+
           height: 53px;
 
           border: none;
+
           border-radius: 10px;
 
           background:
@@ -687,43 +671,50 @@ export default function LoginPage() {
               #0871c2
             );
 
-          color: white;
+          color: #ffffff;
 
           font-size: 14px;
+
           font-weight: 700;
 
           cursor: pointer;
 
           box-shadow:
-            0 9px 22px rgba(8,120,194,0.22);
+            0 9px 22px
+            rgba(8, 120, 194, 0.22);
 
-          transition: all 0.2s ease;
-        }
-
-        .signInButton span {
-          margin-left: 9px;
-
-          font-size: 18px;
+          transition:
+            transform 0.2s ease,
+            box-shadow 0.2s ease;
         }
 
         .signInButton:hover:not(:disabled) {
           transform: translateY(-1px);
 
           box-shadow:
-            0 12px 26px rgba(8,120,194,0.28);
+            0 12px 28px
+            rgba(8, 120, 194, 0.28);
         }
 
         .signInButton:disabled {
           opacity: 0.65;
+
           cursor: not-allowed;
         }
 
-        /* --------------------------------
-           REGISTER
-           -------------------------------- */
+        .arrow {
+          margin-left: 9px;
+
+          font-size: 18px;
+        }
+
+        /* ================================
+           REGISTER DIVIDER
+           ================================ */
 
         .divider {
           display: flex;
+
           align-items: center;
 
           gap: 12px;
@@ -743,13 +734,19 @@ export default function LoginPage() {
           color: #94a2af;
 
           font-size: 10px;
+
           font-weight: 700;
 
           letter-spacing: 1.3px;
         }
 
+        /* ================================
+           REGISTER BUTTON
+           ================================ */
+
         .registerButton {
           width: 100%;
+
           height: 52px;
 
           border: 1.5px solid #087cca;
@@ -761,11 +758,14 @@ export default function LoginPage() {
           color: #0875bf;
 
           font-size: 14px;
+
           font-weight: 700;
 
           cursor: pointer;
 
-          transition: all 0.2s ease;
+          transition:
+            background 0.2s ease,
+            transform 0.2s ease;
         }
 
         .registerButton:hover {
@@ -773,6 +773,10 @@ export default function LoginPage() {
 
           transform: translateY(-1px);
         }
+
+        /* ================================
+           FOOTER
+           ================================ */
 
         .loginFooter {
           margin-top: 24px;
@@ -786,9 +790,9 @@ export default function LoginPage() {
           line-height: 1.7;
         }
 
-        /* --------------------------------
+        /* ================================
            TABLET
-           -------------------------------- */
+           ================================ */
 
         @media (max-width: 900px) {
 
@@ -797,8 +801,6 @@ export default function LoginPage() {
           }
 
           .loginWindow {
-            grid-template-columns: 1fr 1fr;
-
             min-height: 620px;
           }
 
@@ -817,12 +819,11 @@ export default function LoginPage() {
           .loginContent h1 {
             font-size: 34px;
           }
-
         }
 
-        /* --------------------------------
+        /* ================================
            MOBILE
-           -------------------------------- */
+           ================================ */
 
         @media (max-width: 700px) {
 
@@ -840,10 +841,10 @@ export default function LoginPage() {
 
           .brandPanel {
             padding: 40px 25px;
-          }
 
-          .brandContent {
-            max-width: 400px;
+            border-right: none;
+
+            border-bottom: 1px solid #e2edf4;
           }
 
           .companyLogo {
@@ -865,23 +866,6 @@ export default function LoginPage() {
           .loginContent h1 {
             font-size: 34px;
           }
-
-          .backgroundATop {
-            width: 280px;
-            height: 280px;
-
-            top: -170px;
-            right: -150px;
-          }
-
-          .backgroundABottom {
-            width: 300px;
-            height: 300px;
-
-            bottom: -190px;
-            left: -170px;
-          }
-
         }
 
       `}</style>
