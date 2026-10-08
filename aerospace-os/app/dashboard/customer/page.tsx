@@ -50,43 +50,52 @@ function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
   return <svg {...common}>{paths[name]}</svg>;
 }
 
-const requests = [
-  {
-    id: "SR-20261008-001",
-    subject: "Laptop not starting",
-    service: "Laptop",
-    date: "08 Oct 2026",
-    status: "Under Review",
-  },
-  {
-    id: "SR-20261007-002",
-    subject: "CCTV camera issue",
-    service: "CCTV",
-    date: "07 Oct 2026",
-    status: "In Progress",
-  },
-  {
-    id: "SR-20261005-003",
-    subject: "Printer not working",
-    service: "Printer",
-    date: "05 Oct 2026",
-    status: "Quoted",
-  },
-  {
-    id: "SR-20261002-004",
-    subject: "Network intermittent",
-    service: "Network",
-    date: "02 Oct 2026",
-    status: "Completed",
-  },
-  {
-    id: "SR-20260928-005",
-    subject: "Desktop running slow",
-    service: "Desktop",
-    date: "28 Sep 2026",
-    status: "Completed",
-  },
-];
+type CustomerRequest = {
+  _id: string;
+  requestNumber: string;
+  subject: string;
+  serviceType?: string;
+  status: string;
+  createdAt?: string;
+};
+
+function requestStatusLabel(status: string): string {
+  const map: Record<string, string> = {
+    draft: "Draft",
+    submitted: "Submitted",
+    under_review: "Under Review",
+    quote_sent: "Quoted",
+    customer_action_required: "Action Required",
+    accepted: "Accepted",
+    rejected: "Rejected",
+    ticket_created: "Ticket Created",
+    assigned: "Assigned",
+    in_progress: "In Progress",
+    completed: "Completed",
+    closed: "Closed",
+    cancelled: "Cancelled",
+  };
+  return map[status] || status.replace(/_/g, " ");
+}
+
+function requestStatusClass(status: string): string {
+  if (status === "completed" || status === "closed") return "green";
+  if (status === "in_progress" || status === "assigned" || status === "ticket_created") return "blue";
+  if (status === "quote_sent" || status === "accepted") return "purple";
+  if (status === "rejected" || status === "cancelled") return "red";
+  return "orange";
+}
+
+function formatRequestDate(value?: string): string {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "—";
+  return date.toLocaleDateString("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+  });
+}
 
 type CustomerDevice = {
   _id: string;
@@ -162,6 +171,7 @@ export default function CustomerDashboard() {
   const [profileMessage, setProfileMessage] = useState("");
   const [devices, setDevices] = useState<CustomerDevice[]>([]);
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<string[]>([]);
+  const [requests, setRequests] = useState<CustomerRequest[]>([]);
 
   useEffect(() => {
     async function loadProfile() {
@@ -187,6 +197,13 @@ export default function CustomerDashboard() {
           setProfile(loadedProfile);
           setProfileDraft(loadedProfile);
           setDevices(Array.isArray(data.devices) ? data.devices : []);
+        }
+
+        const requestsResponse = await fetch("/api/service-requests", { cache: "no-store" });
+        const requestsData = await requestsResponse.json();
+
+        if (requestsResponse.ok && requestsData.success) {
+          setRequests(Array.isArray(requestsData.requests) ? requestsData.requests : []);
         }
       } catch (error) {
         console.error("Failed to load customer profile:", error);
@@ -281,10 +298,7 @@ export default function CustomerDashboard() {
   }
 
   function statusClass(status: string) {
-    if (status === "Completed") return "green";
-    if (status === "In Progress") return "blue";
-    if (status === "Quoted") return "purple";
-    return "orange";
+    return requestStatusClass(status);
   }
 
   return (
@@ -328,7 +342,7 @@ export default function CustomerDashboard() {
           >
             <span className="navIcon"><Icon name="requests" size={17} /></span>
             Service Requests
-            <b>5</b>
+            <b>{requests.length}</b>
           </button>
 
           <button
@@ -422,10 +436,10 @@ export default function CustomerDashboard() {
                 <div className="mainColumn">
                   {/* STATS */}
                   <div className="stats">
-                    <Stat icon="assets" title="Total Requests" value="12" type="blue" />
-                    <Stat icon="calendar" title="Pending" value="3" type="orange" />
-                    <Stat icon="settings" title="In Progress" value="4" type="purple" />
-                    <Stat icon="check" title="Completed" value="5" type="green" />
+                    <Stat icon="assets" title="Total Requests" value={String(requests.length)} type="blue" />
+                    <Stat icon="calendar" title="Pending" value={String(requests.filter(r => ["submitted","under_review","quote_sent","customer_action_required"].includes(r.status)).length)} type="orange" />
+                    <Stat icon="settings" title="In Progress" value={String(requests.filter(r => ["assigned","in_progress","ticket_created"].includes(r.status)).length)} type="purple" />
+                    <Stat icon="check" title="Completed" value={String(requests.filter(r => ["completed","closed"].includes(r.status)).length)} type="green" />
                   </div>
 
                   {/* REQUESTS */}
@@ -455,16 +469,16 @@ export default function CustomerDashboard() {
                         <span>Action</span>
                       </div>
 
-                      {requests.map((r, index) => (
-                        <div className="tableRow" key={r.id}>
+                      {requests.slice(0, 5).map((r, index) => (
+                        <div className="tableRow" key={r._id}>
                           <span>{index + 1}</span>
-                          <strong>{r.id}</strong>
+                          <strong>{r.requestNumber}</strong>
                           <span>{r.subject}</span>
-                          <span>{r.service}</span>
-                          <span>{r.date}</span>
+                          <span>{r.serviceType || "General IT Support"}</span>
+                          <span>{formatRequestDate(r.createdAt)}</span>
 
-                          <em className={`status ${statusClass(r.status)}`}>
-                            {r.status}
+                          <em className={`status ${requestStatusClass(r.status)}`}>
+                            {requestStatusLabel(r.status)}
                           </em>
 
                           <button
@@ -640,18 +654,18 @@ export default function CustomerDashboard() {
               <section className="card fullCard">
                 <div className="requestFullList">
                   {requests.map((r) => (
-                    <div className="fullRequest" key={r.id}>
-                      <div className="requestNumber">{r.id}</div>
+                    <div className="fullRequest" key={r._id}>
+                      <div className="requestNumber">{r.requestNumber}</div>
 
                       <div className="requestSubject">
                         <strong>{r.subject}</strong>
-                        <span>{r.service} Support</span>
+                        <span>{r.serviceType || "General IT Support"} Support</span>
                       </div>
 
-                      <div className="requestDate">{r.date}</div>
+                      <div className="requestDate">{formatRequestDate(r.createdAt)}</div>
 
-                      <em className={`status ${statusClass(r.status)}`}>
-                        {r.status}
+                      <em className={`status ${requestStatusClass(r.status)}`}>
+                        {requestStatusLabel(r.status)}
                       </em>
 
                       <button className="viewButton">View</button>
