@@ -250,6 +250,17 @@ export default function LoginPage() {
 
               </div>
 
+              {/* FORGOT PASSWORD */}
+              <div className="forgotRow">
+                <button
+                  type="button"
+                  className="forgotPassword"
+                  onClick={() => router.push("/forgot-password")}
+                >
+                  Forgot Password?
+                </button>
+              </div>
+
               {/* ERROR */}
               {error && (
                 <div className="errorBox">
@@ -747,6 +758,32 @@ export default function LoginPage() {
           width: 19px;
 
           height: 19px;
+        }
+
+        /* ================================
+           FORGOT PASSWORD
+           ================================ */
+
+        .forgotRow {
+          display: flex;
+          justify-content: flex-end;
+          margin-top: -8px;
+          margin-bottom: 16px;
+        }
+
+        .forgotPassword {
+          border: none;
+          background: transparent;
+          color: #0875bf;
+          font-size: 12px;
+          font-weight: 700;
+          padding: 4px 0;
+          cursor: pointer;
+        }
+
+        .forgotPassword:hover {
+          color: #065f9d;
+          text-decoration: underline;
         }
 
         /* ================================
