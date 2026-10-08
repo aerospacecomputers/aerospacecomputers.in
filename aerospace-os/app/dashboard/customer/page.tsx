@@ -354,10 +354,12 @@ export default function CustomerDashboard() {
       {/* SIDEBAR */}
       <aside className="sidebar">
         <div className="brand">
-          <img
-            src="https://aerospacecomputers.in/images/logo.svg"
-            alt="Aerospace OS"
-          />
+          <span className="brandMark" aria-label="Aerospace OS logo">
+            <img
+              src="https://aerospacecomputers.in/images/logo.svg"
+              alt=""
+            />
+          </span>
 
           <div>
             <strong>AEROSPACE OS</strong>
@@ -1117,9 +1119,22 @@ export default function CustomerDashboard() {
           border-bottom: 1px solid #edf1f5;
         }
 
-        .brand img {
+        .brandMark {
+          display: block;
           width: 42px;
           height: 42px;
+          overflow: hidden;
+          flex: 0 0 42px;
+          position: relative;
+        }
+
+        .brandMark img {
+          width: 175px;
+          height: 42px;
+          max-width: none;
+          object-fit: contain;
+          object-position: left center;
+          display: block;
         }
 
         .brand strong {
