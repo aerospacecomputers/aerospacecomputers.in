@@ -88,59 +88,49 @@ const requests = [
   },
 ];
 
-const assets: {
+type CustomerDevice = {
+  _id: string;
   name: string;
-  type: string;
-  icon: IconName;
-  serial: string;
-  location: string;
-  status: string;
-}[] = [
-  {
-    name: "Dell Latitude 5420",
-    type: "Laptop",
-    icon: "laptop",
-    serial: "DL5420-001",
-    location: "Office",
-    status: "Active",
-  },
-  {
-    name: "HP ProDesk 400",
-    type: "Desktop",
-    icon: "desktop",
-    serial: "HP400-002",
-    location: "Office",
-    status: "Active",
-  },
-  {
-    name: "Hikvision IP Camera",
-    type: "CCTV Camera",
-    icon: "camera",
-    serial: "HK-CAM-003",
-    location: "Reception",
-    status: "Active",
-  },
-  {
-    name: "HP LaserJet Pro",
-    type: "Printer",
-    icon: "printer",
-    serial: "HP-LJ-005",
-    location: "Accounts",
-    status: "Under Service",
-  },
-];
+  deviceType: string;
+  brand?: string;
+  model?: string;
+  serialNumber?: string;
+  location?: string;
+  active?: boolean;
+};
 
-const categories: [IconName, string, string][] = [
-  ["laptop", "Laptops", "6"],
-  ["desktop", "Desktops", "4"],
-  ["camera", "CCTV Cameras", "8"],
-  ["printer", "Printers", "3"],
-  ["network", "Network Devices", "5"],
-  ["server", "Servers", "2"],
-  ["wifi", "Wi-Fi / AP", "4"],
-  ["power", "UPS / Power", "2"],
-  ["other", "Other", "3"],
-];
+function deviceIcon(type: string): IconName {
+  const map: Record<string, IconName> = {
+    laptop: "laptop",
+    desktop: "desktop",
+    server: "server",
+    printer: "printer",
+    router: "network",
+    switch: "network",
+    cctv: "camera",
+    nvr: "camera",
+    dvr: "camera",
+    ups: "power",
+  };
+  return map[type.toLowerCase()] || "other";
+}
+
+function deviceTypeLabel(type: string): string {
+  const map: Record<string, string> = {
+    laptop: "Laptop",
+    desktop: "Desktop",
+    server: "Server",
+    printer: "Printer",
+    router: "Router",
+    switch: "Switch",
+    cctv: "CCTV Camera",
+    nvr: "NVR",
+    dvr: "DVR",
+    ups: "UPS / Power",
+    other: "Other",
+  };
+  return map[type.toLowerCase()] || type;
+}
 
 export default function CustomerDashboard() {
   const [page, setPage] = useState<Page>("dashboard");
@@ -158,6 +148,8 @@ export default function CustomerDashboard() {
   const [profileDraft, setProfileDraft] = useState(profile);
   const [loadingProfile, setLoadingProfile] = useState(true);
   const [profileMessage, setProfileMessage] = useState("");
+  const [devices, setDevices] = useState<CustomerDevice[]>([]);
+  const [selectedDeviceIds, setSelectedDeviceIds] = useState<string[]>([]);
 
   useEffect(() => {
     async function loadProfile() {
@@ -182,6 +174,7 @@ export default function CustomerDashboard() {
 
           setProfile(loadedProfile);
           setProfileDraft(loadedProfile);
+          setDevices(Array.isArray(data.devices) ? data.devices : []);
         }
       } catch (error) {
         console.error("Failed to load customer profile:", error);
@@ -215,7 +208,7 @@ export default function CustomerDashboard() {
           description,
           preferredDate: preferredDate || null,
           preferredTime: preferredTime || null,
-          deviceIds: [],
+          deviceIds: selectedDeviceIds,
           attachmentUrls: [],
         }),
       });
@@ -511,17 +504,32 @@ export default function CustomerDashboard() {
                     </div>
 
                     <div className="assetCards">
-                      {assets.map((asset) => (
-                        <AssetCard
-                          key={asset.serial}
-                          asset={asset}
-                          onRequest={() => {
-                            setSubject(`${asset.name} Service Request`);
-                            setService(asset.type);
-                            setPage("new-request");
-                          }}
-                        />
-                      ))}
+                      {devices.length > 0 ? (
+                        devices.slice(0, 4).map((device) => (
+                          <AssetCard
+                            key={device._id}
+                            asset={{
+                              id: device._id,
+                              name: device.name || [device.brand, device.model].filter(Boolean).join(" ") || "Unnamed Asset",
+                              type: deviceTypeLabel(device.deviceType),
+                              icon: deviceIcon(device.deviceType),
+                              serial: device.serialNumber || "Not provided",
+                              location: device.location || "Location not provided",
+                              status: device.active === false ? "Inactive" : "Active",
+                            }}
+                            onRequest={() => {
+                              setSubject(`${device.name || "Asset"} Service Request`);
+                              setService(deviceTypeLabel(device.deviceType));
+                              setSelectedDeviceIds([device._id]);
+                              setPage("new-request");
+                            }}
+                          />
+                        ))
+                      ) : (
+                        <div className="emptyAssets">
+                          No assets have been added to your account yet.
+                        </div>
+                      )}
                     </div>
                   </section>
                 </div>
@@ -1510,6 +1518,25 @@ export default function CustomerDashboard() {
           padding: 12px 17px 18px;
         }
 
+        .assetVisual {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          margin-bottom: 10px;
+        }
+
+        .emptyAssets {
+          grid-column: 1 / -1;
+          padding: 28px 18px;
+          text-align: center;
+          color: #7d90a2;
+          font-size: 11px;
+          border: 1px dashed #d7e3ec;
+          border-radius: 10px;
+          background: #fbfdff;
+        }
+
         .assetCard {
           min-width: 0;
           border: 1px solid #e1eaf2;
@@ -2426,6 +2453,7 @@ function AssetCard({
   onRequest,
 }: {
   asset: {
+    id: string;
     name: string;
     type: string;
     icon: IconName;
@@ -2444,13 +2472,12 @@ function AssetCard({
 
   return (
     <div className="assetCard">
-      <div className="assetImage"><Icon name={asset.icon} size={22} /></div>
-
-      <div className="assetTop">
-        <span className="assetType">{asset.type}</span>
-
+      <div className="assetVisual">
+        <div className="assetImage"><Icon name={asset.icon} size={22} /></div>
         <em className={`status ${status}`}>{asset.status}</em>
       </div>
+
+      <span className="assetType">{asset.type}</span>
 
       <h3>{asset.name}</h3>
 
