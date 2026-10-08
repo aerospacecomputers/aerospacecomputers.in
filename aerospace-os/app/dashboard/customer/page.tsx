@@ -2696,7 +2696,9 @@ function PageHeader({
         )}
       </div>
 
-      {children}
+      <div style={{ marginTop: "32px" }}>
+        {children}
+      </div>
     </>
   );
 }
