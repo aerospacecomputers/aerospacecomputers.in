@@ -417,8 +417,8 @@ export default function CustomerDashboard() {
                 <div className="mainColumn">
                   {/* STATS */}
                   <div className="stats">
-                    <Stat icon="requests" title="Total Requests" value="12" type="blue" />
-                    <Stat icon="clock" title="Pending" value="3" type="orange" />
+                    <Stat icon="assets" title="Total Requests" value="12" type="blue" />
+                    <Stat icon="calendar" title="Pending" value="3" type="orange" />
                     <Stat icon="settings" title="In Progress" value="4" type="purple" />
                     <Stat icon="check" title="Completed" value="5" type="green" />
                   </div>
@@ -1224,15 +1224,18 @@ export default function CustomerDashboard() {
 
         .stat {
           position: relative;
-          background: white;
-          border: 1px solid #e3ebf2;
-          border-radius: 12px;
-          padding: 13px 14px;
+          background: linear-gradient(180deg, #ffffff 0%, #f8fbfe 100%);
+          border: 1px solid #e1eaf2;
+          border-radius: 13px;
+          padding: 12px 10px 13px;
           display: flex;
+          flex-direction: column;
           align-items: center;
-          gap: 11px;
-          min-height: 72px;
+          justify-content: center;
+          gap: 9px;
+          min-height: 92px;
           overflow: hidden;
+          text-align: center;
           box-shadow: 0 3px 12px rgba(28, 63, 94, 0.05);
         }
 
@@ -1253,12 +1256,13 @@ export default function CustomerDashboard() {
         .stat.green::after { background: #d9f5e5; }
 
         .statIcon {
-          width: 42px;
-          height: 42px;
-          flex: 0 0 42px;
-          border-radius: 12px;
+          width: 44px;
+          height: 44px;
+          flex: 0 0 44px;
+          border-radius: 14px;
           display: grid;
           place-items: center;
+          box-shadow: 0 5px 12px rgba(28, 63, 94, 0.08);
         }
 
         .statIcon.blue {
@@ -1285,36 +1289,38 @@ export default function CustomerDashboard() {
           position: relative;
           z-index: 1;
           display: flex;
-          flex-direction: column;
-          gap: 5px;
+          align-items: center;
+          justify-content: center;
+          gap: 7px;
           min-width: 0;
+          width: 100%;
         }
 
         .stat span {
-          display: block;
-          color: #647a90;
-          font-size: 10px;
+          display: inline-block;
+          color: #526d86;
+          font-size: 11px;
           font-weight: 700;
           text-transform: capitalize;
-          letter-spacing: 0.1px;
+          letter-spacing: 0;
+          white-space: nowrap;
         }
 
         .stat strong {
           display: inline-flex;
           align-items: center;
           justify-content: center;
-          align-self: flex-start;
-          min-width: 34px;
-          height: 28px;
-          padding: 0 9px;
-          margin-top: 0;
+          min-width: 30px;
+          height: 26px;
+          padding: 0 8px;
+          margin: 0;
           border-radius: 8px;
           background: #f3f7fb;
           color: #173a5b;
-          font-size: 19px;
+          font-size: 17px;
           line-height: 1;
           font-weight: 800;
-          box-shadow: inset 0 0 0 1px #e6edf3;
+          box-shadow: inset 0 0 0 1px #e2eaf1;
         }
 
         /* CARDS */
@@ -2244,7 +2250,7 @@ function Stat({
   return (
     <div className={`stat ${type}`}>
       <div className={`statIcon ${type}`}>
-        <Icon name={icon} size={18} />
+        <Icon name={icon} size={21} />
       </div>
 
       <div className="statContent">
