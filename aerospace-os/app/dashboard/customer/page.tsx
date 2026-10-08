@@ -2179,21 +2179,21 @@ export default function CustomerDashboard() {
 
 
         .requestModal { width:min(620px,100%); background:#fff; border-radius:14px; box-shadow:0 22px 70px rgba(11,48,82,.24); overflow:hidden; }
-        .requestModalBody { padding:22px 24px; }
+        .requestModalBody { padding:24px 26px; }
         .requestDetailGrid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
         .requestDetailGrid small, .requestDetailGrid strong, .requestDescription small { display:block; }
-        .requestDetailGrid small, .requestDescription small { color:#96a3b0; font-size:8px; font-weight:700; letter-spacing:.6px; }
-        .requestDetailGrid strong { color:#4a6279; font-size:10px; margin-top:5px; }
+        .requestDetailGrid small, .requestDescription small { color:#96a3b0; font-size:10px; font-weight:700; letter-spacing:.6px; }
+        .requestDetailGrid strong { color:#4a6279; font-size:13px; margin-top:6px; }
         .requestDescription { margin-top:20px; padding-top:17px; border-top:1px solid #edf1f5; }
-        .requestDescription p { margin:7px 0 0; color:#62788d; font-size:10px; line-height:1.6; white-space:pre-wrap; }
+        .requestDescription p { margin:8px 0 0; color:#62788d; font-size:13px; line-height:1.65; white-space:pre-wrap; }
         .profilePageTop { display:flex; align-items:center; gap:17px; width:100%; }
         .profileEditButton { margin-left:auto; border:1px solid #cfe5f5; background:#f0f8ff; color:#0872bd; border-radius:6px; padding:8px 11px; display:flex; align-items:center; gap:6px; font-size:9px; font-weight:700; cursor:pointer; }
         .modalBackdrop { position:fixed; inset:0; z-index:100; background:rgba(10,38,65,.34); backdrop-filter:blur(3px); display:grid; place-items:center; padding:18px; }
         .profileModal { width:min(560px,100%); background:#fff; border-radius:14px; box-shadow:0 22px 70px rgba(11,48,82,.24); overflow:hidden; }
         .modalHeader { padding:22px 24px 18px; border-bottom:1px solid #edf1f5; display:flex; justify-content:space-between; align-items:flex-start; }
-        .modalHeader span { color:#0876c5; font-size:8px; font-weight:800; letter-spacing:1.5px; }
-        .modalHeader h2 { margin:5px 0 3px; color:#173858; font-size:18px; }
-        .modalHeader p { margin:0; color:#8798a9; font-size:10px; }
+        .modalHeader span { color:#0876c5; font-size:10px; font-weight:800; letter-spacing:1.5px; }
+        .modalHeader h2 { margin:6px 0 4px; color:#173858; font-size:22px; }
+        .modalHeader p { margin:0; color:#8798a9; font-size:12px; }
         .modalClose { border:0; background:#f2f6fa; color:#65788c; width:30px; height:30px; border-radius:50%; font-size:20px; cursor:pointer; }
         .modalBody { padding:22px 24px; }
         .profileEditGrid { display:grid; grid-template-columns:1fr 1fr; gap:15px; }
