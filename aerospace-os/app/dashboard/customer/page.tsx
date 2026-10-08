@@ -150,8 +150,44 @@ export default function CustomerDashboard() {
   const [description, setDescription] = useState("");
   const [submitted, setSubmitted] = useState(false);
   const [editingProfile, setEditingProfile] = useState(false);
-  const [profile, setProfile] = useState({ name: "Jitesh Kukreja", email: "jitesh@example.com", phone: "+91 98765 43210", address: "Delhi, India" });
+  const [profile, setProfile] = useState({ name: "", email: "", phone: "", address: "" });
   const [profileDraft, setProfileDraft] = useState(profile);
+  const [loadingProfile, setLoadingProfile] = useState(true);
+  const [profileMessage, setProfileMessage] = useState("");
+
+  useEffect(() => {
+    async function loadProfile() {
+      try {
+        const response = await fetch("/api/customer/dashboard", { cache: "no-store" });
+        const data = await response.json();
+
+        if (response.ok && data.success && data.profile) {
+          const loadedProfile = {
+            name: data.profile.name || "",
+            email: data.profile.email || "",
+            phone: data.profile.phone || "",
+            address: [
+              data.profile.address,
+              data.profile.city,
+              data.profile.state,
+              data.profile.pincode,
+            ]
+              .filter(Boolean)
+              .join(", "),
+          };
+
+          setProfile(loadedProfile);
+          setProfileDraft(loadedProfile);
+        }
+      } catch (error) {
+        console.error("Failed to load customer profile:", error);
+      } finally {
+        setLoadingProfile(false);
+      }
+    }
+
+    loadProfile();
+  }, []);
 
   function logout() {
     window.location.href = "/api/auth/logout";
@@ -162,8 +198,39 @@ export default function CustomerDashboard() {
     setSubmitted(true);
   }
 
-  function openProfileEditor() { setProfileDraft(profile); setEditingProfile(true); }
-  function saveProfile() { setProfile(profileDraft); setEditingProfile(false); }
+  function openProfileEditor() {
+    setProfileDraft(profile);
+    setProfileMessage("");
+    setEditingProfile(true);
+  }
+
+  async function saveProfile() {
+    try {
+      setProfileMessage("");
+
+      const response = await fetch("/api/customer/dashboard", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(profileDraft),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok || !data.success) {
+        setProfileMessage(data.message || "Failed to update profile");
+        return;
+      }
+
+      setProfile(profileDraft);
+      setEditingProfile(false);
+      setProfileMessage("Profile updated successfully");
+    } catch (error) {
+      console.error("Failed to update customer profile:", error);
+      setProfileMessage("Failed to update profile");
+    }
+  }
 
   function statusClass(status: string) {
     if (status === "Completed") return "green";
