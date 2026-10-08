@@ -2248,12 +2248,35 @@ function Stat({
   type: string;
 }) {
   return (
-    <div className={`stat ${type}`}>
-      <div className={`statIcon ${type}`}>
+    <div
+      className={`stat ${type}`}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        textAlign: "center",
+      }}
+    >
+      <div
+        className={`statIcon ${type}`}
+        style={{ margin: "0 auto", flexShrink: 0 }}
+      >
         <Icon name={icon} size={21} />
       </div>
 
-      <div className="statContent">
+      <div
+        className="statContent"
+        style={{
+          display: "flex",
+          flexDirection: "row",
+          alignItems: "center",
+          justifyContent: "center",
+          gap: "12px",
+          width: "100%",
+          marginTop: "9px",
+        }}
+      >
         <span className="statLabel">{title}</span>
         <span className="statValue">{value}</span>
       </div>
