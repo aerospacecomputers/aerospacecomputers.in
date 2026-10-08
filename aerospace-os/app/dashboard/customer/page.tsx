@@ -1102,10 +1102,10 @@ export default function CustomerDashboard() {
           left: 0;
           top: 0;
           bottom: 0;
-          width: 238px;
+          width: 290px;
           background: #fff;
           border-right: 1px solid #e3ebf3;
-          padding: 20px 15px;
+          padding: 24px 18px;
           z-index: 20;
           display: flex;
           flex-direction: column;
@@ -1114,23 +1114,25 @@ export default function CustomerDashboard() {
         .brand {
           display: flex;
           align-items: center;
-          gap: 12px;
-          padding: 5px 9px 21px;
+          gap: 16px;
+          padding: 5px 10px 24px;
           border-bottom: 1px solid #edf1f5;
         }
 
         .brandMark {
           display: block;
-          width: 48px;
-          height: 48px;
+          width: 58px;
+          height: 58px;
           overflow: hidden;
-          flex: 0 0 48px;
+          flex: 0 0 58px;
           position: relative;
+          border-right: 1px solid #dfe7ef;
+          padding-right: 14px;
         }
 
         .brandMark img {
-          width: 200px;
-          height: 48px;
+          width: 240px;
+          height: 58px;
           max-width: none;
           object-fit: contain;
           object-position: left center;
@@ -1145,18 +1147,18 @@ export default function CustomerDashboard() {
         .brand strong {
           display: block;
           color: #0870bd;
-          font-size: 15px;
+          font-size: 17px;
           line-height: 1.15;
-          letter-spacing: 0.8px;
+          letter-spacing: 0.9px;
           white-space: nowrap;
         }
 
         .brand span {
           display: block;
           color: #687f95;
-          font-size: 12px;
+          font-size: 13px;
           font-weight: 500;
-          margin-top: 4px;
+          margin-top: 5px;
           text-align: center;
           width: 100%;
         }
@@ -1187,7 +1189,7 @@ export default function CustomerDashboard() {
           align-items: center;
           gap: 12px;
           color: #65778a;
-          font-size: 12px;
+          font-size: 13px;
           font-weight: 600;
           cursor: pointer;
           margin-bottom: 3px;
@@ -1276,7 +1278,7 @@ export default function CustomerDashboard() {
         /* MAIN */
 
         .main {
-          margin-left: 238px;
+          margin-left: 290px;
           min-height: 100vh;
         }
 
