@@ -1632,44 +1632,65 @@ export default function CustomerDashboard() {
 
         .quick {
           width: 100%;
-          border: 0;
-          background: transparent;
-          border-top: 1px solid #edf1f5;
-          padding: 11px 0;
+          min-height: 78px;
+          border: 1px solid #d6e3ee;
+          background: #ffffff;
+          border-radius: 10px;
+          padding: 11px 12px;
           display: flex;
           align-items: center;
-          gap: 9px;
+          gap: 11px;
           text-align: left;
           cursor: pointer;
+          box-sizing: border-box;
+          transition: transform 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+        }
+
+        .quick + .quick {
+          margin-top: 10px;
+        }
+
+        .quick:hover {
+          border-color: #0b78c8;
+          background: #f7fbff;
+          box-shadow: 0 4px 12px rgba(11, 120, 200, 0.10);
+          transform: translateY(-1px);
         }
 
         .quickIcon {
-          width: 32px;
-          height: 32px;
-          border-radius: 7px;
+          width: 38px;
+          height: 38px;
+          min-width: 38px;
+          border-radius: 9px;
           background: #e8f4fd;
-          color: #0875c2;
+          color: #0876c5;
           display: grid;
           place-items: center;
-          font-size: 14px;
+          font-size: 17px;
+          font-weight: 700;
         }
 
         .quick strong {
           display: block;
-          color: #304b65;
-          font-size: 9px;
+          color: #173a5b;
+          font-size: 12px;
+          font-weight: 800;
+          margin-bottom: 4px;
         }
 
         .quick span {
           display: block;
-          color: #94a2b0;
-          font-size: 8px;
-          margin-top: 2px;
+          color: #718499;
+          font-size: 10px;
+          line-height: 1.35;
+          margin-top: 0;
         }
 
         .quick b {
           margin-left: auto;
-          color: #8798a9;
+          color: #0876c5;
+          font-size: 18px;
+          font-weight: 700;
         }
 
         .sideCardHeader {
