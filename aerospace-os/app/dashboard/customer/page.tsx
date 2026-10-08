@@ -1146,9 +1146,11 @@ export default function CustomerDashboard() {
 
         .brand span {
           display: block;
-          color: #7f91a4;
-          font-size: 11px;
-          margin-top: 3px;
+          color: #687f95;
+          font-size: 12px;
+          font-weight: 500;
+          margin-top: 4px;
+          text-align: center;
         }
 
         nav {
