@@ -1228,11 +1228,11 @@ export default function CustomerDashboard() {
           border: 1px solid #e1eaf2;
           border-radius: 13px;
           padding: 12px 10px 13px;
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-          justify-content: center;
-          gap: 9px;
+          display: flex !important;
+          flex-direction: column !important;
+          align-items: center !important;
+          justify-content: center !important;
+          gap: 9px !important;
           min-height: 92px;
           overflow: hidden;
           text-align: center;
@@ -1259,6 +1259,7 @@ export default function CustomerDashboard() {
           width: 44px;
           height: 44px;
           flex: 0 0 44px;
+          margin: 0 auto;
           border-radius: 14px;
           display: grid;
           place-items: center;
@@ -1288,12 +1289,11 @@ export default function CustomerDashboard() {
         .statContent {
           position: relative;
           z-index: 1;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 7px;
+          display: block !important;
+          width: auto !important;
           min-width: 0;
-          width: 100%;
+          text-align: center;
+          white-space: nowrap;
         }
 
         .stat span {
@@ -1313,13 +1313,14 @@ export default function CustomerDashboard() {
           min-width: 30px;
           height: 26px;
           padding: 0 8px;
-          margin: 0;
+          margin: 0 0 0 9px;
           border-radius: 8px;
           background: #f3f7fb;
           color: #173a5b;
           font-size: 17px;
           line-height: 1;
           font-weight: 800;
+          vertical-align: middle;
           box-shadow: inset 0 0 0 1px #e2eaf1;
         }
 
