@@ -6,7 +6,7 @@ const SESSION_COOKIE = "aerospace_session";
 const SESSION_SECRET =
   process.env.SESSION_SECRET || "CHANGE_THIS_IN_RENDER";
 
-function hashPassword(password: string): string {
+export function hashPassword(password: string): string {
   const salt = crypto.randomBytes(16).toString("hex");
 
   const hash = crypto
