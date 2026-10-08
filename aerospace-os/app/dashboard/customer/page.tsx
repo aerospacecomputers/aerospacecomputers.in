@@ -217,6 +217,10 @@ export default function CustomerDashboard() {
   const [selectedRequest, setSelectedRequest] = useState<CustomerRequest | null>(null);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [timeDraft, setTimeDraft] = useState("09:00");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [dateDraft, setDateDraft] = useState("");
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [timeDraft, setTimeDraft] = useState("09:00");
 
   useEffect(() => {
     async function loadProfile() {
@@ -353,7 +357,7 @@ export default function CustomerDashboard() {
         <div className="brand">
           <img
             src="https://aerospacecomputers.in/images/logo.svg"
-            alt="Aerospace Computers"
+            alt="Aerospace OS"
           />
 
           <div>
@@ -726,45 +730,6 @@ export default function CustomerDashboard() {
             </PageHeader>
           )}
 
-          {showTimePicker && (
-            <div className="modalBackdrop" onClick={() => setShowTimePicker(false)}>
-              <div className="timePickerModal" onClick={(event) => event.stopPropagation()}>
-                <div className="modalHeader">
-                  <div>
-                    <span>PREFERRED TIME</span>
-                    <h2>Select Time</h2>
-                    <p>Choose the preferred service time.</p>
-                  </div>
-                  <button className="modalClose" onClick={() => setShowTimePicker(false)}>×</button>
-                </div>
-
-                <div className="timePickerBody">
-                  <input
-                    className="timePickerInput"
-                    type="time"
-                    value={timeDraft}
-                    onChange={(event) => setTimeDraft(event.target.value)}
-                  />
-                </div>
-
-                <div className="modalFooter">
-                  <button className="cancelButton" onClick={() => setShowTimePicker(false)}>
-                    Cancel
-                  </button>
-                  <button
-                    className="submitButton"
-                    onClick={() => {
-                      setPreferredTime(timeDraft);
-                      setShowTimePicker(false);
-                    }}
-                  >
-                    OK
-                  </button>
-                </div>
-              </div>
-            </div>
-          )}
-
           {selectedRequest && (
             <div className="modalBackdrop" onClick={() => setSelectedRequest(null)}>
               <div className="requestModal" onClick={(event) => event.stopPropagation()}>
@@ -941,11 +906,39 @@ export default function CustomerDashboard() {
 
                     <label>
                       Preferred Date
-                      <input
-                        type="date"
-                        value={preferredDate}
-                        onChange={(e) => setPreferredDate(e.target.value)}
-                      />
+                      <div className="pickerField">
+                        <input
+                          type="text"
+                          value={preferredDate}
+                          placeholder="dd/mm/yyyy"
+                          readOnly
+                          onClick={() => {
+                            setDateDraft(preferredDate);
+                            setShowDatePicker(true);
+                            setShowTimePicker(false);
+                          }}
+                        />
+                        {showDatePicker && (
+                          <div className="inlinePicker" onClick={(event) => event.stopPropagation()}>
+                            <div className="inlinePickerTitle">Select preferred date</div>
+                            <input
+                              type="date"
+                              value={dateDraft}
+                              onChange={(event) => setDateDraft(event.target.value)}
+                            />
+                            <button
+                              type="button"
+                              className="inlinePickerOk"
+                              onClick={() => {
+                                setPreferredDate(dateDraft);
+                                setShowDatePicker(false);
+                              }}
+                            >
+                              OK
+                            </button>
+                          </div>
+                        )}
+                      </div>
                     </label>
 
                     <label>
@@ -2265,9 +2258,11 @@ export default function CustomerDashboard() {
         }
 
 
-        .timePickerModal { width:min(430px,100%); background:#fff; border-radius:14px; box-shadow:0 22px 70px rgba(11,48,82,.24); overflow:hidden; }
-        .timePickerBody { padding:28px 26px; }
-        .timePickerInput { width:100%; height:56px; border:1px solid #dbe5ee; border-radius:9px; padding:0 14px; color:#29445e; background:#fbfdff; font-size:18px; font-family:inherit; }
+        .pickerField { position: relative; width: 100%; }
+        .inlinePicker { position: absolute; z-index: 30; top: calc(100% + 8px); left: 0; width: min(320px, 100%); padding: 14px; background: #fff; border: 1px solid #dbe5ee; border-radius: 10px; box-shadow: 0 14px 34px rgba(11,48,82,.16); }
+        .inlinePickerTitle { color:#29445e; font-size:12px; font-weight:700; margin-bottom:10px; }
+        .inlinePicker input { width:100%; box-sizing:border-box; height:46px; border:1px solid #dbe5ee; border-radius:7px; padding:0 11px; color:#29445e; background:#fbfdff; font-size:14px; font-family:inherit; }
+        .inlinePickerOk { margin-top:10px; width:100%; border:0; border-radius:7px; padding:10px 14px; background:#0876c5; color:#fff; font-size:12px; font-weight:700; cursor:pointer; }
         .requestModal { width:min(620px,100%); background:#fff; border-radius:14px; box-shadow:0 22px 70px rgba(11,48,82,.24); overflow:hidden; }
         .requestModalBody { padding:24px 26px; }
         .requestDetailGrid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
