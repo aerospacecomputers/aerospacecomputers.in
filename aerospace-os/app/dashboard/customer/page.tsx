@@ -1937,7 +1937,7 @@ export default function CustomerDashboard() {
         }
 
         .pageHeader {
-          margin-bottom: 20px;
+          margin-bottom: 38px;
         }
 
         .pageHeader h1 {
