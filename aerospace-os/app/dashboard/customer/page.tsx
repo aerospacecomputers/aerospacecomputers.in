@@ -216,7 +216,7 @@ export default function CustomerDashboard() {
   }, []);
 
   function logout() {
-    window.location.href = "/api/auth/logout";
+    window.location.href = "https://os.aerospacecomputers.in/api/auth/logout";
   }
 
   async function submitRequest(e: React.FormEvent) {
