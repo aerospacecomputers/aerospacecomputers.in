@@ -2039,6 +2039,7 @@ export default function CustomerDashboard() {
           display: grid;
           grid-template-columns: repeat(5, 1fr);
           gap: 10px;
+          margin-bottom: 28px;
         }
 
         .assetCategory {
@@ -2062,12 +2063,12 @@ export default function CustomerDashboard() {
 
         .assetCategory strong {
           color: #183a59;
-          font-size: 18px;
+          font-size: 20px;
         }
 
-        .assetCategory small {
-          color: #8a9bab;
-          font-size: 11px;
+         .assetCategory small {
+          color: #6f8295;
+          font-size: 13px;
           margin-top: 2px;
         }
 
@@ -2686,7 +2687,7 @@ function PageHeader({
           <div
             style={{
               color: "#0876c5",
-              fontSize: "9px",
+              fontSize: "11px",
               fontWeight: 800,
               letterSpacing: "1.5px",
               marginBottom: "6px",
@@ -2709,7 +2710,7 @@ function PageHeader({
             style={{
               margin: "5px 0 0",
               color: "#5f7489",
-              fontSize: "13px",
+              fontSize: "15px",
               fontWeight: 500,
             }}
           >
