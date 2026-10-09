@@ -317,7 +317,7 @@ export default function CustomerDashboard() {
       const response = await fetch("/api/customer/service-offers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ offerId, action, response: action === "change_requested" && requestedPrice.trim() ? (() => { const base = Number(requestedPrice); const gst = Math.round(base * gstPercentage) / 100; const total = Math.round((base + gst) * 100) / 100; return `Requested price before GST: ₹${base.toFixed(2)}. GST (${gstPercentage}%): ₹${gst.toFixed(2)}. Requested total including GST: ₹${total.toFixed(2)}.${offerResponse.trim() ? ` Customer note: ${offerResponse.trim()}` : ""}`; })() : offerResponse }),
+        body: JSON.stringify({ offerId, action, response: action === "change_requested" && requestedPrice.trim() ? (() => { const base = Number(requestedPrice); const gst = Math.round(base * gstPercentage) / 100; const total = Math.round((base + gst) * 100) / 100; return `Requested total including GST: ₹${total.toFixed(2)}. Requested price before GST: ₹${base.toFixed(2)}. GST (${gstPercentage}%): ₹${gst.toFixed(2)}.${offerResponse.trim() ? ` Customer note: ${offerResponse.trim()}` : ""}`; })() : offerResponse }),
       });
       const data = await response.json();
       if (!response.ok || !data.success) {
