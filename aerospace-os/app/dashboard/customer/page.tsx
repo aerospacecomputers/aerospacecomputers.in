@@ -2245,9 +2245,9 @@ export default function CustomerDashboard() {
 
         .fullRequest {
           display: grid;
-          grid-template-columns: minmax(170px, 1fr) minmax(190px, 1.2fr) minmax(105px, 0.7fr) minmax(150px, 0.85fr) 55px;
+          grid-template-columns: minmax(170px, 1fr) minmax(190px, 1.2fr) minmax(75px, 0.45fr) minmax(175px, 1fr) 55px;
           align-items: center;
-          column-gap: 10px;
+          column-gap: 8px;
           row-gap: 10px;
           padding: 16px 12px;
           border-bottom: 1px solid #edf1f5;
@@ -2261,10 +2261,14 @@ export default function CustomerDashboard() {
         .requestSubject span { overflow-wrap: anywhere; }
 
         .fullRequest .status {
-          display: inline-block;
-          justify-self: center;
+          display: flex;
+          justify-self: stretch;
+          align-items: center;
+          justify-content: center;
           width: 100%;
-          max-width: 175px;
+          max-width: none;
+          min-height: 38px;
+          padding: 6px 12px;
           box-sizing: border-box;
           white-space: normal;
           overflow-wrap: anywhere;
