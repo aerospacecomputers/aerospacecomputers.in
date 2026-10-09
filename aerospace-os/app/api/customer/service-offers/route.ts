@@ -26,10 +26,11 @@ export async function POST(request: Request) {
     if (session.role !== "customer") return NextResponse.json({ success: false, message: "Customer access required" }, { status: 403 });
     const body = await request.json();
     const offerId = String(body.offerId || "");
-    const action = String(body.action || "");
+    const actionValue = String(body.action || "");
+    const action = actionValue as "accepted" | "rejected" | "change_requested";
     const responseText = String(body.response || "").trim();
     if (!mongoose.isValidObjectId(offerId)) return NextResponse.json({ success: false, message: "Invalid offer ID" }, { status: 400 });
-    if (!["accepted", "rejected", "change_requested"].includes(action)) return NextResponse.json({ success: false, message: "Choose accept, reject, or request a change" }, { status: 400 });
+    if (!["accepted", "rejected", "change_requested"].includes(actionValue)) return NextResponse.json({ success: false, message: "Choose accept, reject, or request a change" }, { status: 400 });
     if (action === "change_requested" && !responseText) return NextResponse.json({ success: false, message: "Please explain what change you need" }, { status: 400 });
 
     await connectMongoDB();
