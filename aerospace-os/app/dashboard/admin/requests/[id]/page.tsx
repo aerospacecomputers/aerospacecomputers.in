@@ -44,6 +44,7 @@ export default function AdminRequestDetailPage() {
   const [otherCharges, setOtherCharges] = useState("0");
   const [gstPercentage, setGstPercentage] = useState("18");
   const [notes, setNotes] = useState("");
+  const [quickAccepting, setQuickAccepting] = useState(false);
 
   async function load() {
     setLoading(true);
@@ -81,6 +82,39 @@ export default function AdminRequestDetailPage() {
   const gstAmount = subtotal * Math.max(0, Number(gstPercentage) || 0) / 100;
   const total = subtotal + gstAmount;
   const canSendOffer = !!record && ["submitted", "under_review", "quote_sent", "customer_action_required"].includes(record.status);
+
+  function requestedPriceFromResponse(value?: string | null) {
+    if (!value) return null;
+    const match = value.match(/(?:₹|INR\\s*|Rs\\.?\\s*)([0-9][0-9,]*(?:\\.[0-9]{1,2})?)|([0-9][0-9,]*(?:\\.[0-9]{1,2})?)\\s*(?:rupees|INR|Rs\\.?)/i);
+    const raw = match?.[1] || match?.[2];
+    if (!raw) return null;
+    const amount = Number(raw.replace(/,/g, ""));
+    return Number.isFinite(amount) && amount > 0 ? amount : null;
+  }
+
+  async function agreeToCustomerPrice() {
+    if (!offer) return;
+    const requestedPrice = requestedPriceFromResponse(offer.customerResponse);
+    if (!requestedPrice) {
+      setError("No clear price found. Use the revised offer form, or ask the customer to include an amount such as ₹500 or Rs. 500.");
+      return;
+    }
+    if (!window.confirm(`Agree to the customer's requested total of ${money(requestedPrice)} and send it for customer confirmation?`)) return;
+    setQuickAccepting(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch(`/api/admin/service-requests/${id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "agree_customer_price", totalAmount: requestedPrice }) });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.message || "Could not agree to the customer's price.");
+      setNotice(data.message || "Updated offer sent to customer for confirmation.");
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not agree to the customer's price.");
+    } finally {
+      setQuickAccepting(false);
+    }
+  }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -161,6 +195,11 @@ export default function AdminRequestDetailPage() {
                 </div>
                 {offer.notes && <div className="customerResponseBox"><span>Notes sent to customer</span><p>{offer.notes}</p></div>}
                 {offer.customerResponse && <div className="customerResponseBox responseReceived"><span>Customer's response / change request</span><p>{offer.customerResponse}</p>{offer.customerRespondedAt && <small>Received {dateText(offer.customerRespondedAt)}</small>}</div>}
+                {offer.status === "change_requested" && offer.customerResponse && <div className="quickAgree">
+                  <strong>Agree with customer's price?</strong>
+                  <p>{requestedPriceFromResponse(offer.customerResponse) ? `Detected requested total: ${money(requestedPriceFromResponse(offer.customerResponse)!)}` : "No clear price detected. The customer's message must include an amount such as ₹500 or Rs. 500."}</p>
+                  <button type="button" onClick={() => void agreeToCustomerPrice()} disabled={quickAccepting || !requestedPriceFromResponse(offer.customerResponse)}>{quickAccepting ? "Sending…" : "OK — Agree & Send Price"}</button>
+                </div>}
                 <p className="muted small">Sending a revised offer creates a new offer record. Customer acceptance will not automatically create a ticket.</p>
               </section>}
             </div>
@@ -221,7 +260,7 @@ export default function AdminRequestDetailPage() {
         .status,.customerType,.lock { display:inline-flex; align-items:center; padding:8px 10px; border-radius:7px; background:#e5f2ff; color:#176da9; font-size:10px; font-weight:700; text-transform:capitalize; white-space:nowrap; }
         .columns { max-width:1300px; margin:0 auto; display:grid; grid-template-columns:minmax(0,1fr) minmax(340px,.9fr); gap:20px; align-items:start; }.left { display:grid; gap:17px; }
         .card { background:white; border:1px solid #e0e8f0; border-radius:13px; padding:22px; box-shadow:0 5px 18px #173b5b06; min-width:0; }.card h2 { margin:0 0 17px; color:#183b5a; font-size:16px; }.card h3 { margin:0 0 10px; color:#1b3d5c; font-size:15px; }.description { white-space:pre-wrap; color:#5f758c; font-size:12px; line-height:1.75; }
-        .details { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:17px; margin-top:21px; }.details div { display:flex; flex-direction:column; gap:6px; min-width:0; }.details span,.totals span { color:#8394a6; font-size:10px; }.details strong { color:#294762; font-size:11px; overflow-wrap:anywhere; text-transform:capitalize; }.offerBreakdown { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:20px; padding:15px; background:#f5f9fc; border:1px solid #e5edf4; border-radius:9px; }.offerBreakdown div { display:flex; flex-direction:column; gap:5px; min-width:0; }.offerBreakdown span,.customerResponseBox span { color:#8295a8; font-size:10px; }.offerBreakdown strong { color:#36536e; font-size:12px; overflow-wrap:anywhere; }.offerBreakdown .offerTotal { grid-column:1 / -1; flex-direction:row; align-items:center; justify-content:space-between; padding-top:13px; margin-top:4px; border-top:1px solid #dce7f0; }.offerBreakdown .offerTotal span { color:#17486c; font-size:12px; font-weight:800; }.offerBreakdown .offerTotal strong { color:#0878bc; font-size:20px; }.customerResponseBox { margin-top:13px; padding:13px; border-radius:8px; background:#f7fafc; border:1px solid #e5edf4; }.customerResponseBox p { margin:7px 0 0; color:#405d76; font-size:12px; line-height:1.6; white-space:pre-wrap; }.customerResponseBox small { display:block; margin-top:8px; color:#8194a7; font-size:10px; }.responseReceived { background:#fff8e9; border-color:#f2dfb4; }.notes { margin-top:20px; padding:13px; background:#f6f9fc; border-radius:8px; font-size:11px; }.notes p { color:#647b92; white-space:pre-wrap; }
+        .details { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:17px; margin-top:21px; }.details div { display:flex; flex-direction:column; gap:6px; min-width:0; }.details span,.totals span { color:#8394a6; font-size:10px; }.details strong { color:#294762; font-size:11px; overflow-wrap:anywhere; text-transform:capitalize; }.offerBreakdown { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:20px; padding:15px; background:#f5f9fc; border:1px solid #e5edf4; border-radius:9px; }.offerBreakdown div { display:flex; flex-direction:column; gap:5px; min-width:0; }.offerBreakdown span,.customerResponseBox span { color:#8295a8; font-size:10px; }.offerBreakdown strong { color:#36536e; font-size:12px; overflow-wrap:anywhere; }.offerBreakdown .offerTotal { grid-column:1 / -1; flex-direction:row; align-items:center; justify-content:space-between; padding-top:13px; margin-top:4px; border-top:1px solid #dce7f0; }.offerBreakdown .offerTotal span { color:#17486c; font-size:12px; font-weight:800; }.offerBreakdown .offerTotal strong { color:#0878bc; font-size:20px; }.customerResponseBox { margin-top:13px; padding:13px; border-radius:8px; background:#f7fafc; border:1px solid #e5edf4; }.customerResponseBox p { margin:7px 0 0; color:#405d76; font-size:12px; line-height:1.6; white-space:pre-wrap; }.customerResponseBox small { display:block; margin-top:8px; color:#8194a7; font-size:10px; }.responseReceived { background:#fff8e9; border-color:#f2dfb4; }.quickAgree { display:grid; gap:10px; margin-top:14px; padding:14px; border:1px solid #bfe4ce; border-radius:9px; background:#f1fbf5; }.quickAgree strong { color:#206b43; font-size:12px; }.quickAgree p { color:#577969; font-size:11px; line-height:1.5; margin:0; }.quickAgree button { width:100%; border:0; border-radius:7px; padding:12px; background:#18834c; color:#fff; font-size:12px; font-weight:800; cursor:pointer; }.quickAgree button:disabled { opacity:.5; cursor:not-allowed; }.notes { margin-top:20px; padding:13px; background:#f6f9fc; border-radius:8px; font-size:11px; }.notes p { color:#647b92; white-space:pre-wrap; }
         .customerName { color:#1b3d5c; font-weight:700; font-size:14px; margin-bottom:9px; }.customerLine { color:#607991; font-size:12px; margin:7px 0; }.customerType { margin-top:10px; background:#f1f6fb; color:#627b93; }
         .offerCard { padding:24px; }.formHeading { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:18px; }.formHeading h2 { margin:0; }.lock { font-size:9px; background:#f0f6fb; color:#6c8399; }
         form label { display:block; margin-bottom:15px; color:#425d77; font-size:11px; font-weight:700; }input,textarea { display:block; width:100%; margin-top:7px; padding:11px 12px; border:1px solid #d5e0ea; border-radius:8px; background:#fff; color:#173650; font:12px Arial,sans-serif; outline-color:#0b81c8; }textarea { resize:vertical; line-height:1.6; }.fieldGrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
