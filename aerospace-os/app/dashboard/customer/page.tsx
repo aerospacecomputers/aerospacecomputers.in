@@ -2245,11 +2245,41 @@ export default function CustomerDashboard() {
 
         .fullRequest {
           display: grid;
-          grid-template-columns: 1.3fr 2fr 120px 110px 55px;
+          grid-template-columns: minmax(155px, 1.1fr) minmax(180px, 1.35fr) minmax(88px, 0.7fr) minmax(135px, 1fr) 55px;
           align-items: center;
-          gap: 15px;
+          gap: 12px;
           padding: 16px 0;
           border-bottom: 1px solid #edf1f5;
+        }
+
+        .fullRequest > * { min-width: 0; }
+
+        .requestNumber { overflow-wrap: anywhere; }
+
+        .requestSubject strong,
+        .requestSubject span { overflow-wrap: anywhere; }
+
+        .fullRequest .status {
+          display: inline-block;
+          justify-self: start;
+          max-width: 100%;
+          white-space: normal;
+          overflow-wrap: anywhere;
+          line-height: 1.35;
+          text-align: center;
+        }
+
+        .requestDate { overflow-wrap: anywhere; }
+
+        @media (max-width: 760px) {
+          .fullRequest {
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+            gap: 9px 12px;
+            align-items: start;
+          }
+          .fullRequest .requestDate { margin-top: 0; }
+          .fullRequest .status { justify-self: start; text-align: left; }
+          .fullRequest .viewButton { justify-self: end; }
         }
 
         .fullRequest:last-child {
