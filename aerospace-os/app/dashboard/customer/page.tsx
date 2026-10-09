@@ -1120,26 +1120,26 @@ export default function CustomerDashboard() {
         }
 
         .brandMark {
-          display: block;
-          width: 72px;
+          display: flex;
+          align-items: center;
+          justify-content: flex-start;
+          width: 82px;
           height: 58px;
           box-sizing: border-box;
-          overflow: hidden;
-          flex: 0 0 72px;
-          position: relative;
+          flex: 0 0 82px;
           border-right: 1px solid #dfe7ef;
           padding-right: 14px;
+          overflow: visible;
         }
 
         .brandMark img {
-          width: 240px;
-          height: 58px;
-          margin-left: 0;
-          max-width: none;
-          object-fit: contain;
-          object-position: left center;
           display: block;
-
+          width: 58px;
+          height: 58px;
+          max-width: 58px;
+          object-fit: contain;
+          object-position: center;
+          flex: 0 0 58px;
         }
 
         .brandText {
