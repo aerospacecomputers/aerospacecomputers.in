@@ -241,6 +241,33 @@ export default function AdminRequestDetailPage() {
           {ticket && <section className="card ticketActionCard ticketCreatedCard">
             <div><p className="eyebrow">TICKET CREATED</p><h2>{ticket.ticketNumber}</h2><p className="muted small">Status: {ticket.status.replace(/_/g, " ")} · Approved amount: {money(ticket.approvedAmount)} · {ticket.engineerId ? "Engineer assigned" : "Engineer assignment pending"}</p></div>
           </section>}
+          {offerHistory.length > 0 && <section className="card offerHistoryCard">
+            <h2>Offer & price change history</h2>
+            <p className="muted small">Every offer and customer response is listed in order, so you can compare the original quote with each requested or revised price.</p>
+            <div className="offerHistoryList">
+              {offerHistory.map((item, index) => (
+                <article className="offerHistoryItem" key={String((item as any)._id || index)}>
+                  <div className="offerHistoryTop">
+                    <div><strong>Offer {index + 1}{index === offerHistory.length - 1 ? " — Latest" : ""}</strong><span>Offer created: {dateTimeText(item.createdAt)}</span></div>
+                    <em className={`historyStatus ${item.status === "accepted" ? "historyAccepted" : item.status === "change_requested" ? "historyChange" : item.status === "rejected" ? "historyRejected" : "historySent"}`}>{item.status.replace(/_/g, " ")}</em>
+                  </div>
+                  <div className="offerHistoryFacts">
+                    <div><span>Proposed date</span><strong>{dateText(item.proposedDate)}</strong></div>
+                    <div><span>Proposed time</span><strong>{item.proposedTime}</strong></div>
+                    <div><span>Subtotal</span><strong>{money(item.subtotal)}</strong></div>
+                    <div><span>GST ({item.gstPercentage}%)</span><strong>{money(item.gstAmount)}</strong></div>
+                  </div>
+                  <div className="offerHistoryTotal"><span>Quoted total (including GST)</span><strong>{money(item.totalAmount)}</strong></div>
+                  {item.notes && <div className="offerHistoryNote"><span>Admin notes</span><p>{item.notes}</p></div>}
+                  {item.customerRespondedAt && <div className={`offerHistoryResponse ${item.status === "change_requested" ? "historyChange" : ""}`}>
+                    <strong>{item.status === "change_requested" ? "Customer requested a change" : item.status === "accepted" ? "Customer accepted this offer" : item.status === "rejected" ? "Customer rejected this offer" : "Customer response"}</strong>
+                    <span>Response received: {dateTimeText(item.customerRespondedAt)}</span>
+                    {item.customerResponse && <p>{item.customerResponse}</p>}
+                  </div>}
+                </article>
+              ))}
+            </div>
+          </section>}
           <div className="columns">
             <div className="left">
               <section className="card">
@@ -262,33 +289,7 @@ export default function AdminRequestDetailPage() {
                 <div className="customerLine">{customer?.phone || "Phone not available"}</div>
                 <span className="customerType">{customer?.customerType === "business" ? "Business customer" : "Individual / home customer"}</span>
               </section>
-              {offerHistory.length > 0 && <section className="card offerHistoryCard">
-                <h2>Offer & price change history</h2>
-                <p className="muted small">Every offer and customer response is listed in order, so you can compare the original quote with each requested or revised price.</p>
-                <div className="offerHistoryList">
-                  {offerHistory.map((item, index) => (
-                    <article className="offerHistoryItem" key={String((item as any)._id || index)}>
-                      <div className="offerHistoryTop">
-                        <div><strong>Offer {index + 1}{index === offerHistory.length - 1 ? " — Latest" : ""}</strong><span>Offer created: {dateTimeText(item.createdAt)}</span></div>
-                        <em className={`historyStatus ${item.status === "accepted" ? "historyAccepted" : item.status === "change_requested" ? "historyChange" : item.status === "rejected" ? "historyRejected" : "historySent"}`}>{item.status.replace(/_/g, " ")}</em>
-                      </div>
-                      <div className="offerHistoryFacts">
-                        <div><span>Proposed date</span><strong>{dateText(item.proposedDate)}</strong></div>
-                        <div><span>Proposed time</span><strong>{item.proposedTime}</strong></div>
-                        <div><span>Subtotal</span><strong>{money(item.subtotal)}</strong></div>
-                        <div><span>GST ({item.gstPercentage}%)</span><strong>{money(item.gstAmount)}</strong></div>
-                      </div>
-                      <div className="offerHistoryTotal"><span>Quoted total (including GST)</span><strong>{money(item.totalAmount)}</strong></div>
-                      {item.notes && <div className="offerHistoryNote"><span>Admin notes</span><p>{item.notes}</p></div>}
-                      {item.customerRespondedAt && <div className={`offerHistoryResponse ${item.status === "change_requested" ? "historyChange" : ""}`}>
-                        <strong>{item.status === "change_requested" ? "Customer requested a change" : item.status === "accepted" ? "Customer accepted this offer" : item.status === "rejected" ? "Customer rejected this offer" : "Customer response"}</strong>
-                        <span>Response received: {dateTimeText(item.customerRespondedAt)}</span>
-                        {item.customerResponse && <p>{item.customerResponse}</p>}
-                      </div>}
-                    </article>
-                  ))}
-                </div>
-              </section>}
+
               {offer?.status === "change_requested" && offer.customerResponse && <section className="card quickAgreeHistory">
                 <strong>Agree with customer's requested price?</strong>
                 <p>{requestedPriceFromResponse(offer.customerResponse) ? `Detected requested total: ${money(requestedPriceFromResponse(offer.customerResponse)!)}` : "No clear price detected. The customer's message must include an amount such as ₹500 or Rs. 500."}</p>
