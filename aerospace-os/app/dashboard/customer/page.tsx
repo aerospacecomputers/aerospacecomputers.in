@@ -1139,7 +1139,7 @@ export default function CustomerDashboard() {
           object-fit: contain;
           object-position: left center;
           display: block;
-          clip-path: inset(0 76% 0 0);
+          clip-path: inset(0 80% 0 0);
         }
 
         .brandText {
