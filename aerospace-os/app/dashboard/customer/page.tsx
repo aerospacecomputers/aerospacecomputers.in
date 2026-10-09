@@ -356,7 +356,7 @@ export default function CustomerDashboard() {
         <div className="brand">
           <span className="brandMark" aria-label="Aerospace OS logo">
             <img
-              src="https://aerospacecomputers.in/images/logo.svg"
+              src="/aerospace-a-logo.gif"
               alt=""
             />
           </span>
@@ -1139,7 +1139,7 @@ export default function CustomerDashboard() {
           object-fit: contain;
           object-position: left center;
           display: block;
-          clip-path: inset(0 80% 0 0);
+
         }
 
         .brandText {
