@@ -22,14 +22,15 @@ export async function GET(_request: Request, context: Context) {
     const serviceRequest = await ServiceRequest.findById(id).lean();
     if (!serviceRequest) return NextResponse.json({ success: false, message: "Service request not found" }, { status: 404 });
 
-    const [customer, offers, ticket] = await Promise.all([
+    const [customer, offers, ticket, engineers] = await Promise.all([
       User.findById(serviceRequest.customerId).select("name email phone customerType companyId").lean(),
       ServiceOffer.find({ serviceRequestId: serviceRequest._id }).sort({ createdAt: 1 }).lean(),
       Ticket.findOne({ serviceRequestId: serviceRequest._id }).lean(),
+      User.find({ role: "engineer", active: true }).select("_id name email phone").sort({ name: 1 }).lean(),
     ]);
     const offer = offers.length ? offers[offers.length - 1] : null;
 
-    return NextResponse.json({ success: true, request: serviceRequest, customer, offer, offers, ticket });
+    return NextResponse.json({ success: true, request: serviceRequest, customer, offer, offers, ticket, engineers });
   } catch (error) {
     console.error("Admin request detail error:", error);
     return NextResponse.json({ success: false, message: "Unable to load service request" }, { status: 500 });
@@ -46,6 +47,41 @@ export async function POST(request: Request, context: Context) {
     if (!mongoose.isValidObjectId(id)) return NextResponse.json({ success: false, message: "Invalid request ID" }, { status: 400 });
 
     const body = await request.json();
+
+    if (body.action === "assign_engineer") {
+      const engineerId = String(body.engineerId || "");
+      if (!mongoose.isValidObjectId(engineerId)) {
+        return NextResponse.json({ success: false, message: "Choose a valid engineer" }, { status: 400 });
+      }
+
+      await connectMongoDB();
+      const serviceRequest = await ServiceRequest.findById(id);
+      if (!serviceRequest) return NextResponse.json({ success: false, message: "Service request not found" }, { status: 404 });
+
+      const ticket = await Ticket.findOne({ serviceRequestId: serviceRequest._id });
+      if (!ticket) return NextResponse.json({ success: false, message: "Create the ticket before assigning an engineer" }, { status: 409 });
+      if (["completed", "closed", "cancelled"].includes(ticket.status)) {
+        return NextResponse.json({ success: false, message: "A completed, closed, or cancelled ticket cannot be assigned" }, { status: 409 });
+      }
+
+      const engineer = await User.findOne({ _id: engineerId, role: "engineer", active: true }).select("_id name email");
+      if (!engineer) return NextResponse.json({ success: false, message: "Active engineer account not found" }, { status: 404 });
+
+      ticket.engineerId = engineer._id;
+      ticket.status = "assigned";
+      ticket.engineerAssignedAt = new Date();
+      await ticket.save();
+
+      serviceRequest.status = "assigned";
+      await serviceRequest.save();
+
+      return NextResponse.json({
+        success: true,
+        message: `Ticket ${ticket.ticketNumber} assigned to ${engineer.name}. The engineer can now review the ticket.`,
+        ticket,
+        engineer,
+      });
+    }
 
     if (body.action === "create_ticket") {
       await connectMongoDB();
