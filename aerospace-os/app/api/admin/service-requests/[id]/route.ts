@@ -43,6 +43,62 @@ export async function POST(request: Request, context: Context) {
     if (!mongoose.isValidObjectId(id)) return NextResponse.json({ success: false, message: "Invalid request ID" }, { status: 400 });
 
     const body = await request.json();
+
+    if (body.action === "agree_customer_price") {
+      const totalAmount = Number(body.totalAmount);
+      if (!Number.isFinite(totalAmount) || totalAmount <= 0) {
+        return NextResponse.json({ success: false, message: "The customer's requested price must be a valid positive amount" }, { status: 400 });
+      }
+
+      await connectMongoDB();
+      const serviceRequest = await ServiceRequest.findById(id);
+      if (!serviceRequest) return NextResponse.json({ success: false, message: "Service request not found" }, { status: 404 });
+      if (!["quote_sent", "customer_action_required"].includes(serviceRequest.status)) {
+        return NextResponse.json({ success: false, message: "This request has no customer offer awaiting a price decision" }, { status: 409 });
+      }
+
+      const previousOffer = await ServiceOffer.findOne({ serviceRequestId: serviceRequest._id, customerId: serviceRequest.customerId }).sort({ createdAt: -1 });
+      if (!previousOffer || previousOffer.status !== "change_requested" || !previousOffer.customerResponse) {
+        return NextResponse.json({ success: false, message: "There is no customer price request to accept" }, { status: 409 });
+      }
+
+      const priceMatch = previousOffer.customerResponse.match(/(?:₹|INR\\s*|Rs\\.?\\s*)([0-9][0-9,]*(?:\\.[0-9]{1,2})?)|([0-9][0-9,]*(?:\\.[0-9]{1,2})?)\\s*(?:rupees|INR|Rs\\.?)/i);
+      const requestedRaw = priceMatch?.[1] || priceMatch?.[2];
+      const requestedPrice = requestedRaw ? Number(requestedRaw.replace(/,/g, "")) : NaN;
+      if (!Number.isFinite(requestedPrice) || requestedPrice <= 0 || Math.abs(requestedPrice - totalAmount) > 0.01) {
+        return NextResponse.json({ success: false, message: "The agreed amount must match a clear price written in the customer's response (for example ₹500 or Rs. 500)." }, { status: 400 });
+      }
+
+      const gstPercentage = previousOffer.gstPercentage ?? 18;
+      const subtotal = Math.round((totalAmount / (1 + gstPercentage / 100)) * 100) / 100;
+      const gstAmount = Math.round((totalAmount - subtotal) * 100) / 100;
+      const revisedOffer = await ServiceOffer.create({
+        serviceRequestId: serviceRequest._id,
+        customerId: serviceRequest.customerId,
+        proposedDate: previousOffer.proposedDate,
+        proposedTime: previousOffer.proposedTime,
+        labourCharges: subtotal,
+        installationMaterial: 0,
+        travelCharges: 0,
+        otherCharges: 0,
+        subtotal,
+        gstPercentage,
+        gstAmount,
+        totalAmount: Math.round(totalAmount * 100) / 100,
+        notes: "Revised total agreed by the admin based on the customer's price request. This offer is awaiting customer confirmation.",
+        status: "sent",
+      });
+
+      serviceRequest.status = "quote_sent";
+      await serviceRequest.save();
+      return NextResponse.json({
+        success: true,
+        message: "Agreed price saved as a revised offer and made available to the customer for confirmation. No ticket was created.",
+        offer: revisedOffer,
+        emailSent: false,
+      }, { status: 201 });
+    }
+
     const proposedDate = new Date(String(body.proposedDate || ""));
     const proposedTime = String(body.proposedTime || "").trim();
     const notes = String(body.notes || "").trim();
