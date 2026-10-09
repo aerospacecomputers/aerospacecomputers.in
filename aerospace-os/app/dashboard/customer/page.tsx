@@ -1121,10 +1121,11 @@ export default function CustomerDashboard() {
 
         .brandMark {
           display: block;
-          width: 58px;
+          width: 72px;
           height: 58px;
+          box-sizing: border-box;
           overflow: hidden;
-          flex: 0 0 58px;
+          flex: 0 0 72px;
           position: relative;
           border-right: 1px solid #dfe7ef;
           padding-right: 14px;
@@ -1133,6 +1134,7 @@ export default function CustomerDashboard() {
         .brandMark img {
           width: 240px;
           height: 58px;
+          margin-left: 0;
           max-width: none;
           object-fit: contain;
           object-position: left center;
