@@ -16,10 +16,12 @@ type RequestRecord = {
   adminNotes?: string | null;
 };
 type Customer = { name?: string; email?: string; phone?: string; customerType?: string; companyId?: string | null } | null;
-type Offer = { proposedDate: string; proposedTime: string; labourCharges: number; installationMaterial: number; travelCharges: number; otherCharges: number; subtotal: number; gstPercentage: number; gstAmount: number; totalAmount: number; status: string; notes?: string; customerResponse?: string | null; customerRespondedAt?: string | null } | null;
+type Offer = { proposedDate: string; proposedTime: string; labourCharges: number; installationMaterial: number; travelCharges: number; otherCharges: number; subtotal: number; gstPercentage: number; gstAmount: number; totalAmount: number; status: string; notes?: string; customerResponse?: string | null; customerRespondedAt?: string | null; createdAt?: string; updatedAt?: string } | null;
+type OfferHistoryItem = NonNullable<Offer>;
 
 const money = (value: number) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(value || 0);
 const dateText = (value?: string | null) => value ? new Date(value).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+const dateTimeText = (value?: string | null) => value ? new Date(value).toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" }) : "—";
 
 export default function AdminRequestDetailPage() {
   const params = useParams<{ id: string }>();
@@ -28,6 +30,7 @@ export default function AdminRequestDetailPage() {
   const [record, setRecord] = useState<RequestRecord | null>(null);
   const [customer, setCustomer] = useState<Customer>(null);
   const [offer, setOffer] = useState<Offer>(null);
+  const [offerHistory, setOfferHistory] = useState<OfferHistoryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
@@ -56,6 +59,7 @@ export default function AdminRequestDetailPage() {
       setRecord(data.request);
       setCustomer(data.customer || null);
       setOffer(data.offer || null);
+      setOfferHistory(Array.isArray(data.offers) ? data.offers : data.offer ? [data.offer] : []);
       if (data.offer) {
         const d = new Date(data.offer.proposedDate);
         setProposedDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
@@ -177,6 +181,33 @@ export default function AdminRequestDetailPage() {
                 <div className="customerLine">{customer?.phone || "Phone not available"}</div>
                 <span className="customerType">{customer?.customerType === "business" ? "Business customer" : "Individual / home customer"}</span>
               </section>
+              {offerHistory.length > 0 && <section className="card offerHistoryCard">
+                <h2>Offer & price change history</h2>
+                <p className="muted small">Every offer and customer response is listed in order, so you can compare the original quote with each requested or revised price.</p>
+                <div className="offerHistoryList">
+                  {offerHistory.map((item, index) => (
+                    <article className="offerHistoryItem" key={String((item as any)._id || index)}>
+                      <div className="offerHistoryTop">
+                        <div><strong>Offer {index + 1}{index === offerHistory.length - 1 ? " — Latest" : ""}</strong><span>Offer created: {dateTimeText(item.createdAt)}</span></div>
+                        <em className={`historyStatus ${item.status === "accepted" ? "historyAccepted" : item.status === "change_requested" ? "historyChange" : item.status === "rejected" ? "historyRejected" : "historySent"}`}>{item.status.replace(/_/g, " ")}</em>
+                      </div>
+                      <div className="offerHistoryFacts">
+                        <div><span>Proposed date</span><strong>{dateText(item.proposedDate)}</strong></div>
+                        <div><span>Proposed time</span><strong>{item.proposedTime}</strong></div>
+                        <div><span>Subtotal</span><strong>{money(item.subtotal)}</strong></div>
+                        <div><span>GST ({item.gstPercentage}%)</span><strong>{money(item.gstAmount)}</strong></div>
+                      </div>
+                      <div className="offerHistoryTotal"><span>Quoted total (including GST)</span><strong>{money(item.totalAmount)}</strong></div>
+                      {item.notes && <div className="offerHistoryNote"><span>Admin notes</span><p>{item.notes}</p></div>}
+                      {item.customerRespondedAt && <div className={`offerHistoryResponse ${item.status === "change_requested" ? "historyChange" : ""}`}>
+                        <strong>{item.status === "change_requested" ? "Customer requested a change" : item.status === "accepted" ? "Customer accepted this offer" : item.status === "rejected" ? "Customer rejected this offer" : "Customer response"}</strong>
+                        <span>Response received: {dateTimeText(item.customerRespondedAt)}</span>
+                        {item.customerResponse && <p>{item.customerResponse}</p>}
+                      </div>}
+                    </article>
+                  ))}
+                </div>
+              </section>}
               {offer && <section className="card latestOfferCard">
                 <h2>Latest offer sent to customer</h2>
                 <div className="details">
@@ -260,7 +291,7 @@ export default function AdminRequestDetailPage() {
         .status,.customerType,.lock { display:inline-flex; align-items:center; padding:8px 10px; border-radius:7px; background:#e5f2ff; color:#176da9; font-size:10px; font-weight:700; text-transform:capitalize; white-space:nowrap; }
         .columns { max-width:1300px; margin:0 auto; display:grid; grid-template-columns:minmax(0,1fr) minmax(340px,.9fr); gap:20px; align-items:start; }.left { display:grid; gap:17px; }
         .card { background:white; border:1px solid #e0e8f0; border-radius:13px; padding:22px; box-shadow:0 5px 18px #173b5b06; min-width:0; }.card h2 { margin:0 0 17px; color:#183b5a; font-size:16px; }.card h3 { margin:0 0 10px; color:#1b3d5c; font-size:15px; }.description { white-space:pre-wrap; color:#5f758c; font-size:12px; line-height:1.75; }
-        .details { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:17px; margin-top:21px; }.details div { display:flex; flex-direction:column; gap:6px; min-width:0; }.details span,.totals span { color:#8394a6; font-size:10px; }.details strong { color:#294762; font-size:11px; overflow-wrap:anywhere; text-transform:capitalize; }.offerBreakdown { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:20px; padding:15px; background:#f5f9fc; border:1px solid #e5edf4; border-radius:9px; }.offerBreakdown div { display:flex; flex-direction:column; gap:5px; min-width:0; }.offerBreakdown span,.customerResponseBox span { color:#8295a8; font-size:10px; }.offerBreakdown strong { color:#36536e; font-size:12px; overflow-wrap:anywhere; }.offerBreakdown .offerTotal { grid-column:1 / -1; flex-direction:row; align-items:center; justify-content:space-between; padding-top:13px; margin-top:4px; border-top:1px solid #dce7f0; }.offerBreakdown .offerTotal span { color:#17486c; font-size:12px; font-weight:800; }.offerBreakdown .offerTotal strong { color:#0878bc; font-size:20px; }.customerResponseBox { margin-top:13px; padding:13px; border-radius:8px; background:#f7fafc; border:1px solid #e5edf4; }.customerResponseBox p { margin:7px 0 0; color:#405d76; font-size:12px; line-height:1.6; white-space:pre-wrap; }.customerResponseBox small { display:block; margin-top:8px; color:#8194a7; font-size:10px; }.responseReceived { background:#fff8e9; border-color:#f2dfb4; }.quickAgree { display:grid; gap:10px; margin-top:14px; padding:14px; border:1px solid #bfe4ce; border-radius:9px; background:#f1fbf5; }.quickAgree strong { color:#206b43; font-size:12px; }.quickAgree p { color:#577969; font-size:11px; line-height:1.5; margin:0; }.quickAgree button { width:100%; border:0; border-radius:7px; padding:12px; background:#18834c; color:#fff; font-size:12px; font-weight:800; cursor:pointer; }.quickAgree button:disabled { opacity:.5; cursor:not-allowed; }.notes { margin-top:20px; padding:13px; background:#f6f9fc; border-radius:8px; font-size:11px; }.notes p { color:#647b92; white-space:pre-wrap; }
+        .details { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:17px; margin-top:21px; }.details div { display:flex; flex-direction:column; gap:6px; min-width:0; }.details span,.totals span { color:#8394a6; font-size:10px; }.details strong { color:#294762; font-size:11px; overflow-wrap:anywhere; text-transform:capitalize; }.offerHistoryList { display:grid; gap:12px; margin-top:15px; }.offerHistoryItem { padding:14px; border:1px solid #dce8f1; border-radius:9px; background:#fbfdff; }.offerHistoryTop { display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }.offerHistoryTop > div { display:grid; gap:5px; }.offerHistoryTop strong { color:#173a5b; font-size:12px; }.offerHistoryTop span,.offerHistoryFacts span,.offerHistoryNote span,.offerHistoryResponse span { color:#8498ab; font-size:10px; }.historyStatus { border-radius:20px; padding:5px 8px; font-size:9px; font-style:normal; text-transform:capitalize; background:#edf3f8; color:#536b80; }.historyAccepted { background:#e6f7ed; color:#1b7a46; }.historyChange { background:#fff2dc; color:#a66308; }.historyRejected { background:#ffeded; color:#b42318; }.historySent { background:#e8f3ff; color:#176da9; }.offerHistoryFacts { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:11px; margin-top:14px; }.offerHistoryFacts div { display:grid; gap:4px; }.offerHistoryFacts strong { color:#36536e; font-size:11px; }.offerHistoryTotal { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:11px; margin-top:12px; border-radius:7px; background:#eaf6ff; color:#17486c; font-size:11px; font-weight:800; }.offerHistoryTotal strong { color:#0878bc; font-size:17px; }.offerHistoryNote,.offerHistoryResponse { display:grid; gap:6px; margin-top:10px; padding:11px; border-radius:7px; background:#f4f8fb; }.offerHistoryNote p,.offerHistoryResponse p { margin:0; color:#405d76; font-size:11px; line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; }.offerHistoryResponse.historyChange { border:1px solid #f2dfb4; background:#fff8e9; }.offerHistoryResponse > strong { color:#176da9; font-size:11px; }.offerHistoryResponse.historyChange > strong { color:#a66308; }.offerBreakdown { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; margin-top:20px; padding:15px; background:#f5f9fc; border:1px solid #e5edf4; border-radius:9px; }.offerBreakdown div { display:flex; flex-direction:column; gap:5px; min-width:0; }.offerBreakdown span,.customerResponseBox span { color:#8295a8; font-size:10px; }.offerBreakdown strong { color:#36536e; font-size:12px; overflow-wrap:anywhere; }.offerBreakdown .offerTotal { grid-column:1 / -1; flex-direction:row; align-items:center; justify-content:space-between; padding-top:13px; margin-top:4px; border-top:1px solid #dce7f0; }.offerBreakdown .offerTotal span { color:#17486c; font-size:12px; font-weight:800; }.offerBreakdown .offerTotal strong { color:#0878bc; font-size:20px; }.customerResponseBox { margin-top:13px; padding:13px; border-radius:8px; background:#f7fafc; border:1px solid #e5edf4; }.customerResponseBox p { margin:7px 0 0; color:#405d76; font-size:12px; line-height:1.6; white-space:pre-wrap; }.customerResponseBox small { display:block; margin-top:8px; color:#8194a7; font-size:10px; }.responseReceived { background:#fff8e9; border-color:#f2dfb4; }.quickAgree { display:grid; gap:10px; margin-top:14px; padding:14px; border:1px solid #bfe4ce; border-radius:9px; background:#f1fbf5; }.quickAgree strong { color:#206b43; font-size:12px; }.quickAgree p { color:#577969; font-size:11px; line-height:1.5; margin:0; }.quickAgree button { width:100%; border:0; border-radius:7px; padding:12px; background:#18834c; color:#fff; font-size:12px; font-weight:800; cursor:pointer; }.quickAgree button:disabled { opacity:.5; cursor:not-allowed; }.notes { margin-top:20px; padding:13px; background:#f6f9fc; border-radius:8px; font-size:11px; }.notes p { color:#647b92; white-space:pre-wrap; }
         .customerName { color:#1b3d5c; font-weight:700; font-size:14px; margin-bottom:9px; }.customerLine { color:#607991; font-size:12px; margin:7px 0; }.customerType { margin-top:10px; background:#f1f6fb; color:#627b93; }
         .offerCard { padding:24px; }.formHeading { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:18px; }.formHeading h2 { margin:0; }.lock { font-size:9px; background:#f0f6fb; color:#6c8399; }
         form label { display:block; margin-bottom:15px; color:#425d77; font-size:11px; font-weight:700; }input,textarea { display:block; width:100%; margin-top:7px; padding:11px 12px; border:1px solid #d5e0ea; border-radius:8px; background:#fff; color:#173650; font:12px Arial,sans-serif; outline-color:#0b81c8; }textarea { resize:vertical; line-height:1.6; }.fieldGrid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }
