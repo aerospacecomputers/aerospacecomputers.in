@@ -37,7 +37,9 @@ export default function EngineerDashboardPage() {
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [busyId, setBusyId] = useState("");
-  const [notes, setNotes] = useState<Record<string, string>>({});\n  const [filter, setFilter] = useState("all");\n  const [search, setSearch] = useState("");
+  const [notes, setNotes] = useState<Record<string, string>>({});
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
