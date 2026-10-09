@@ -90,10 +90,10 @@ function requestStatusLabel(status: string): string {
     under_review: "Under Review",
     quote_sent: "Quoted",
     customer_action_required: "Action Required",
-    accepted: "Accepted",
+    accepted: "Accepted — Engineer Assignment Pending",
     rejected: "Rejected",
-    ticket_created: "Ticket Created",
-    assigned: "Assigned",
+    ticket_created: "Accepted — Engineer Assignment Pending",
+    assigned: "Engineer Aligned",
     in_progress: "In Progress",
     completed: "Completed",
     closed: "Closed",
@@ -105,7 +105,8 @@ function requestStatusLabel(status: string): string {
 function requestStatusClass(status: string): string {
   if (status === "completed" || status === "closed") return "green";
   if (status === "in_progress" || status === "assigned" || status === "ticket_created") return "blue";
-  if (status === "quote_sent" || status === "accepted") return "purple";
+  if (status === "quote_sent") return "purple";
+  if (status === "accepted") return "green";
   if (status === "rejected" || status === "cancelled") return "red";
   return "orange";
 }
