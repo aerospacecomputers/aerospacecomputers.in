@@ -4,6 +4,7 @@ import { connectMongoDB } from "@/lib/mongodb";
 import { getCurrentSession } from "@/lib/auth";
 import Ticket from "@/lib/models/Ticket";
 import ServiceRequest from "@/lib/models/ServiceRequest";
+import User from "@/lib/models/User";
 
 const allowed = ["accepted_by_engineer", "travelling", "on_site", "working", "waiting", "completed"];
 
@@ -13,11 +14,12 @@ export async function GET() {
   if (session.role !== "engineer") return NextResponse.json({ success: false, message: "Engineer access required" }, { status: 403 });
   try {
     await connectMongoDB();
+    const engineer = await User.findById(session.userId).select("name email").lean();
     const tickets = await Ticket.find({ engineerId: session.userId })
       .populate({ path: "serviceRequestId", select: "requestNumber subject description serviceType preferredDate preferredTime status" })
       .populate({ path: "customerId", select: "name email phone customerType companyId" })
       .sort({ engineerAssignedAt: -1, updatedAt: -1 }).lean();
-    return NextResponse.json({ success: true, tickets });
+    return NextResponse.json({ success: true, engineer: engineer ? { name: engineer.name, email: engineer.email } : null, tickets });
   } catch (error) {
     console.error("Engineer tickets GET error:", error);
     return NextResponse.json({ success: false, message: "Unable to load assigned tickets" }, { status: 500 });
