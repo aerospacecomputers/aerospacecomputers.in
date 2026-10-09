@@ -85,7 +85,7 @@ export default function AdminRequestDetailPage() {
 
   function requestedPriceFromResponse(value?: string | null) {
     if (!value) return null;
-    const match = value.match(/(?:₹|INR\\s*|Rs\\.?\\s*)([0-9][0-9,]*(?:\\.[0-9]{1,2})?)|([0-9][0-9,]*(?:\\.[0-9]{1,2})?)\\s*(?:rupees|INR|Rs\\.?)/i);
+    const match = value.match(/(?:₹|INR\s*|Rs\.?\s*)([0-9][0-9,]*(?:\.[0-9]{1,2})?)|([0-9][0-9,]*(?:\.[0-9]{1,2})?)\s*(?:rupees|INR|Rs\.?)/i);
     const raw = match?.[1] || match?.[2];
     if (!raw) return null;
     const amount = Number(raw.replace(/,/g, ""));
