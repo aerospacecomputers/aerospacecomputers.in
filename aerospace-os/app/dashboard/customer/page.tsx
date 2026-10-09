@@ -879,7 +879,7 @@ export default function CustomerDashboard() {
                   {offers.filter(offer => offer.serviceRequestId === selectedRequest._id).slice().sort((a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()).map((offer, offerIndex) => (
                     <section className="customerOfferPanel" key={offer._id}>
                       <div className="customerOfferHeader">
-                        <div><small>SERVICE OFFER {offerIndex + 1}</small><h3>Proposed schedule & price</h3><span className="offerTimelineTime">Offer sent: {formatOfferDateTime(offer.createdAt)}</span></div>
+                        <div><small>SERVICE OFFER {offerIndex + 1}</small><h3>Proposed schedule & price</h3><span className="offerByLabel">Proposed by Admin</span><span className="offerTimelineTime">Offer sent: {formatOfferDateTime(offer.createdAt)}</span></div>
                         <em className={`status ${offer.status === "sent" ? "purple" : offer.status === "accepted" ? "green" : offer.status === "rejected" ? "red" : "orange"}`}>{offer.status.replace(/_/g, " ")}</em>
                       </div>
                       <div className="customerOfferGrid">
@@ -2471,7 +2471,7 @@ export default function CustomerDashboard() {
         .customerOfferHeader { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; }
         .customerOfferHeader small,.customerOfferGrid small,.customerOfferNotes small { display:block; color:#0876c5; font-size:9px; font-weight:800; letter-spacing:.9px; }
         .customerOfferHeader h3 { margin:5px 0 0; color:#173858; font-size:16px; }
-        .offerTimelineTime { display:block; margin-top:6px; color:#8295a8; font-size:10px; }
+        .offerByLabel { display:inline-block; margin-top:6px; color:#176da9; font-size:10px; font-weight:800; }.offerTimelineTime { display:block; margin-top:4px; color:#8295a8; font-size:10px; }
         .offerTimelineResponse { display:grid; gap:6px; margin-top:13px; padding:12px; border-radius:8px; background:#f1f8ff; border:1px solid #d7e9f7; color:#345773; }
         .offerTimelineResponse strong { font-size:11px; color:#176da9; }
         .offerTimelineResponse span { font-size:10px; color:#7289a0; }
