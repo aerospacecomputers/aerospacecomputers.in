@@ -2456,8 +2456,8 @@ export default function CustomerDashboard() {
         .offerFeedbackSuccess,.offerInfo { background:#eaf8ef; color:#237547; padding:11px; border-radius:7px; font-size:11px; line-height:1.5; }
         .offerInfo { margin:14px 0 0; }
         @media (max-width:480px) { .customerOfferGrid { grid-template-columns:1fr; } .offerActionButtons { flex-direction:column; } .offerActionButtons button { width:100%; } }
-        .requestModal { width:min(620px,100%); background:#fff; border-radius:14px; box-shadow:0 22px 70px rgba(11,48,82,.24); overflow:hidden; }
-        .requestModalBody { padding:24px 26px; }
+        .requestModal { width:min(620px,100%); max-height:calc(100dvh - 36px); margin:auto; display:flex; flex-direction:column; background:#fff; border-radius:14px; box-shadow:0 22px 70px rgba(11,48,82,.24); overflow:hidden; min-height:0; }
+        .requestModalBody { padding:24px 26px; overflow-y:auto; overscroll-behavior:contain; min-height:0; flex:1 1 auto; }
         .requestDetailGrid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
         .requestDetailGrid small, .requestDetailGrid strong, .requestDescription small { display:block; }
         .requestDetailGrid small, .requestDescription small { color:#96a3b0; font-size:10px; font-weight:700; letter-spacing:.6px; }
@@ -2466,7 +2466,7 @@ export default function CustomerDashboard() {
         .requestDescription p { margin:8px 0 0; color:#62788d; font-size:13px; line-height:1.65; white-space:pre-wrap; }
         .profilePageTop { display:flex; align-items:center; gap:17px; width:100%; }
         .profileEditButton { margin-left:auto; border:1px solid #cfe5f5; background:#f0f8ff; color:#0872bd; border-radius:6px; padding:8px 11px; display:flex; align-items:center; gap:6px; font-size:9px; font-weight:700; cursor:pointer; }
-        .modalBackdrop { position:fixed; inset:0; z-index:100; background:rgba(10,38,65,.34); backdrop-filter:blur(3px); display:grid; place-items:center; padding:18px; }
+        .modalBackdrop { position:fixed; inset:0; z-index:100; background:rgba(10,38,65,.34); backdrop-filter:blur(3px); display:grid; place-items:start center; padding:18px; overflow-y:auto; overscroll-behavior:contain; }
         .profileModal { width:min(560px,100%); background:#fff; border-radius:14px; box-shadow:0 22px 70px rgba(11,48,82,.24); overflow:hidden; }
         .modalHeader { padding:22px 24px 18px; border-bottom:1px solid #edf1f5; display:flex; justify-content:space-between; align-items:flex-start; }
         .modalHeader span { color:#0876c5; font-size:10px; font-weight:800; letter-spacing:1.5px; }
