@@ -41,7 +41,7 @@ export async function POST(request: Request) {
     const serviceRequest = await ServiceRequest.findOne({ _id: offer.serviceRequestId, customerId: session.userId });
     if (!serviceRequest) return NextResponse.json({ success: false, message: "Related service request not found" }, { status: 404 });
 
-    offer.status = action;
+    offer.status = action as "accepted" | "rejected" | "change_requested";
     offer.customerResponse = responseText || null;
     offer.customerRespondedAt = new Date();
     await offer.save();
