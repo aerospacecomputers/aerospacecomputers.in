@@ -62,6 +62,25 @@ type CustomerRequest = {
   createdAt?: string;
 };
 
+type CustomerOffer = {
+  _id: string;
+  serviceRequestId: string;
+  proposedDate: string;
+  proposedTime: string;
+  labourCharges: number;
+  installationMaterial: number;
+  travelCharges: number;
+  otherCharges: number;
+  subtotal: number;
+  gstPercentage: number;
+  gstAmount: number;
+  totalAmount: number;
+  notes?: string;
+  status: string;
+  customerResponse?: string | null;
+  createdAt?: string;
+};
+
 function requestStatusLabel(status: string): string {
   const map: Record<string, string> = {
     draft: "Draft",
@@ -214,6 +233,11 @@ export default function CustomerDashboard() {
   const [devices, setDevices] = useState<CustomerDevice[]>([]);
   const [selectedDeviceIds, setSelectedDeviceIds] = useState<string[]>([]);
   const [requests, setRequests] = useState<CustomerRequest[]>([]);
+  const [offers, setOffers] = useState<CustomerOffer[]>([]);
+  const [offerResponse, setOfferResponse] = useState("");
+  const [offerMessage, setOfferMessage] = useState("");
+  const [offerError, setOfferError] = useState("");
+  const [offerBusy, setOfferBusy] = useState(false);
   const [selectedRequest, setSelectedRequest] = useState<CustomerRequest | null>(null);
   const [showTimePicker, setShowTimePicker] = useState(false);
   const [timeDraft, setTimeDraft] = useState("09:00");
@@ -253,6 +277,12 @@ export default function CustomerDashboard() {
         if (requestsResponse.ok && requestsData.success) {
           setRequests(Array.isArray(requestsData.requests) ? requestsData.requests : []);
         }
+
+        const offersResponse = await fetch("/api/customer/service-offers", { cache: "no-store" });
+        const offersData = await offersResponse.json();
+        if (offersResponse.ok && offersData.success) {
+          setOffers(Array.isArray(offersData.offers) ? offersData.offers : []);
+        }
       } catch (error) {
         console.error("Failed to load customer profile:", error);
       } finally {
@@ -265,6 +295,53 @@ export default function CustomerDashboard() {
 
   function logout() {
     window.location.href = "https://os.aerospacecomputers.in/api/auth/logout";
+  }
+
+  function formatOfferDate(value?: string) {
+    if (!value) return "—";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+    return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+  }
+
+  function formatMoney(value?: number) {
+    return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(value || 0);
+  }
+
+  async function respondToOffer(offerId: string, action: "accepted" | "rejected" | "change_requested") {
+    setOfferBusy(true);
+    setOfferError("");
+    setOfferMessage("");
+    try {
+      const response = await fetch("/api/customer/service-offers", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ offerId, action, response: offerResponse }),
+      });
+      const data = await response.json();
+      if (!response.ok || !data.success) {
+        setOfferError(data.message || "Unable to respond to offer.");
+        return;
+      }
+      setOfferMessage(data.message || "Your response has been saved.");
+      setOfferResponse("");
+      const [requestsResponse, offersResponse] = await Promise.all([
+        fetch("/api/service-requests", { cache: "no-store" }),
+        fetch("/api/customer/service-offers", { cache: "no-store" }),
+      ]);
+      const requestsData = await requestsResponse.json();
+      const offersData = await offersResponse.json();
+      if (requestsResponse.ok && requestsData.success) {
+        const updatedRequests = Array.isArray(requestsData.requests) ? requestsData.requests : [];
+        setRequests(updatedRequests);
+        if (selectedRequest) setSelectedRequest(updatedRequests.find((r: CustomerRequest) => r._id === selectedRequest._id) || selectedRequest);
+      }
+      if (offersResponse.ok && offersData.success) setOffers(Array.isArray(offersData.offers) ? offersData.offers : []);
+    } catch {
+      setOfferError("Unable to connect to the server. Please try again.");
+    } finally {
+      setOfferBusy(false);
+    }
   }
 
   async function submitRequest(e: React.FormEvent) {
@@ -779,6 +856,44 @@ export default function CustomerDashboard() {
                     <small>DESCRIPTION</small>
                     <p>{selectedRequest.description || "No description provided."}</p>
                   </div>
+
+                  {offers.filter(offer => offer.serviceRequestId === selectedRequest._id).map(offer => (
+                    <section className="customerOfferPanel" key={offer._id}>
+                      <div className="customerOfferHeader">
+                        <div><small>SERVICE OFFER</small><h3>Proposed schedule & price</h3></div>
+                        <em className={`status ${offer.status === "sent" ? "purple" : offer.status === "accepted" ? "green" : offer.status === "rejected" ? "red" : "orange"}`}>{offer.status.replace(/_/g, " ")}</em>
+                      </div>
+                      <div className="customerOfferGrid">
+                        <div><small>PROPOSED DATE</small><strong>{formatOfferDate(offer.proposedDate)}</strong></div>
+                        <div><small>PROPOSED TIME</small><strong>{offer.proposedTime}</strong></div>
+                        <div><small>LABOUR</small><strong>{formatMoney(offer.labourCharges)}</strong></div>
+                        <div><small>INSTALLATION / MATERIAL</small><strong>{formatMoney(offer.installationMaterial)}</strong></div>
+                        <div><small>TRAVEL</small><strong>{formatMoney(offer.travelCharges)}</strong></div>
+                        <div><small>OTHER CHARGES</small><strong>{formatMoney(offer.otherCharges)}</strong></div>
+                        <div><small>SUBTOTAL</small><strong>{formatMoney(offer.subtotal)}</strong></div>
+                        <div><small>GST ({offer.gstPercentage}%)</small><strong>{formatMoney(offer.gstAmount)}</strong></div>
+                      </div>
+                      <div className="customerOfferTotal"><span>Total quoted price</span><strong>{formatMoney(offer.totalAmount)}</strong></div>
+                      {offer.notes && <div className="customerOfferNotes"><small>ADMIN NOTES</small><p>{offer.notes}</p></div>}
+                      {offer.status === "sent" && (
+                        <div className="offerActions">
+                          <label className="offerResponseLabel">Request changes (optional note)
+                            <textarea value={offerResponse} onChange={event => setOfferResponse(event.target.value)} placeholder="If you need a different date, time, or clarification, explain here." rows={2} />
+                          </label>
+                          {offerError && <div className="offerFeedback offerFeedbackError" role="alert">{offerError}</div>}
+                          {offerMessage && <div className="offerFeedback offerFeedbackSuccess" role="status">{offerMessage}</div>}
+                          <div className="offerActionButtons">
+                            <button className="offerAcceptButton" disabled={offerBusy} onClick={() => void respondToOffer(offer._id, "accepted")}>{offerBusy ? "Please wait…" : "Accept Quoted Offer"}</button>
+                            <button className="offerChangeButton" disabled={offerBusy || !offerResponse.trim()} onClick={() => void respondToOffer(offer._id, "change_requested")}>Request Change</button>
+                            <button className="offerRejectButton" disabled={offerBusy} onClick={() => void respondToOffer(offer._id, "rejected")}>Reject Offer</button>
+                          </div>
+                        </div>
+                      )}
+                      {offer.status === "accepted" && <p className="offerInfo">You accepted this offer. The admin will create a service ticket next.</p>}
+                      {offer.status === "change_requested" && <p className="offerInfo">Your change request has been sent to the admin.</p>}
+                      {offer.status === "rejected" && <p className="offerInfo">You rejected this offer.</p>}
+                    </section>
+                  ))}
                 </div>
 
                 <div className="modalFooter">
@@ -2317,6 +2432,30 @@ export default function CustomerDashboard() {
         .inlinePickerTitle { color:#29445e; font-size:12px; font-weight:700; margin-bottom:10px; }
         .inlinePicker input { width:100%; box-sizing:border-box; height:46px; border:1px solid #dbe5ee; border-radius:7px; padding:0 11px; color:#29445e; background:#fbfdff; font-size:14px; font-family:inherit; }
         .inlinePickerOk { margin-top:10px; width:100%; border:0; border-radius:7px; padding:10px 14px; background:#0876c5; color:#fff; font-size:12px; font-weight:700; cursor:pointer; }
+        .customerOfferPanel { margin-top:22px; padding:17px; border:1px solid #cfe5f5; border-radius:10px; background:#f8fcff; }
+        .customerOfferHeader { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; }
+        .customerOfferHeader small,.customerOfferGrid small,.customerOfferNotes small { display:block; color:#0876c5; font-size:9px; font-weight:800; letter-spacing:.9px; }
+        .customerOfferHeader h3 { margin:5px 0 0; color:#173858; font-size:16px; }
+        .customerOfferGrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+        .customerOfferGrid strong { display:block; color:#3b5872; font-size:12px; margin-top:5px; overflow-wrap:anywhere; }
+        .customerOfferTotal { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px; margin-top:16px; background:#eaf6ff; border-radius:8px; color:#17486c; font-size:12px; font-weight:800; }
+        .customerOfferTotal strong { color:#0876c5; font-size:20px; }
+        .customerOfferNotes { margin-top:13px; padding:12px; background:#fff; border-radius:7px; }
+        .customerOfferNotes p { margin:7px 0 0; color:#62788d; font-size:12px; white-space:pre-wrap; line-height:1.5; }
+        .offerActions { margin-top:16px; }
+        .offerResponseLabel { display:block; color:#405a73; font-size:11px; font-weight:700; }
+        .offerResponseLabel textarea { width:100%; margin-top:7px; padding:10px; border:1px solid #dbe5ee; border-radius:7px; resize:vertical; font:12px Arial,sans-serif; }
+        .offerActionButtons { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
+        .offerActionButtons button { border:0; border-radius:7px; padding:11px 13px; font-size:11px; font-weight:800; cursor:pointer; }
+        .offerActionButtons button:disabled { opacity:.55; cursor:wait; }
+        .offerAcceptButton { background:#0876c5; color:#fff; }
+        .offerChangeButton { background:#fff; color:#176da9; border:1px solid #bcdcf1 !important; }
+        .offerRejectButton { background:#fff0ef; color:#b42318; }
+        .offerFeedback { margin-top:10px; padding:10px; border-radius:7px; font-size:11px; }
+        .offerFeedbackError { background:#fff0ef; color:#b42318; }
+        .offerFeedbackSuccess,.offerInfo { background:#eaf8ef; color:#237547; padding:11px; border-radius:7px; font-size:11px; line-height:1.5; }
+        .offerInfo { margin:14px 0 0; }
+        @media (max-width:480px) { .customerOfferGrid { grid-template-columns:1fr; } .offerActionButtons { flex-direction:column; } .offerActionButtons button { width:100%; } }
         .requestModal { width:min(620px,100%); background:#fff; border-radius:14px; box-shadow:0 22px 70px rgba(11,48,82,.24); overflow:hidden; }
         .requestModalBody { padding:24px 26px; }
         .requestDetailGrid { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
