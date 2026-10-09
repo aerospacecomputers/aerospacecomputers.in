@@ -130,6 +130,7 @@ export default function AdminDashboardPage() {
           <a className="navItem active" href="/dashboard/admin"><Icon name="grid" />Dashboard</a>
           <a className="navItem" href="#service-requests"><Icon name="requests" />Service Requests <span className="navCount">{counts.new}</span></a>
           <a className="navItem" href="#tickets"><Icon name="ticket" />Tickets</a>
+          <a className="navItem" href="/dashboard/admin/engineers"><Icon name="users" />Engineer Accounts</a>
           <a className="navItem" href="#customers"><Icon name="users" />Customers</a>
         </nav>
 
