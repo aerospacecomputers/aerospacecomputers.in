@@ -356,7 +356,7 @@ export default function CustomerDashboard() {
         <div className="brand">
           <span className="brandMark" aria-label="Aerospace OS logo">
             <img
-              src="/aerospace-a-logo.gif"
+              src="/aerospace-a-logo.png"
               alt=""
             />
           </span>
