@@ -2245,11 +2245,11 @@ export default function CustomerDashboard() {
 
         .fullRequest {
           display: grid;
-          grid-template-columns: minmax(180px, 0.95fr) minmax(220px, 1.25fr) minmax(95px, 0.55fr) minmax(145px, 0.75fr) 55px;
+          grid-template-columns: minmax(170px, 1fr) minmax(190px, 1.2fr) minmax(105px, 0.7fr) minmax(150px, 0.85fr) 55px;
           align-items: center;
-          column-gap: 18px;
+          column-gap: 10px;
           row-gap: 10px;
-          padding: 16px 0;
+          padding: 16px 12px;
           border-bottom: 1px solid #edf1f5;
         }
 
