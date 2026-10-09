@@ -235,6 +235,7 @@ export default function CustomerDashboard() {
   const [requests, setRequests] = useState<CustomerRequest[]>([]);
   const [offers, setOffers] = useState<CustomerOffer[]>([]);
   const [offerResponse, setOfferResponse] = useState("");
+  const [requestedPrice, setRequestedPrice] = useState("");
   const [offerMessage, setOfferMessage] = useState("");
   const [offerError, setOfferError] = useState("");
   const [offerBusy, setOfferBusy] = useState(false);
@@ -308,7 +309,7 @@ export default function CustomerDashboard() {
     return new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(value || 0);
   }
 
-  async function respondToOffer(offerId: string, action: "accepted" | "rejected" | "change_requested") {
+  async function respondToOffer(offerId: string, action: "accepted" | "rejected" | "change_requested", gstPercentage = 18) {
     setOfferBusy(true);
     setOfferError("");
     setOfferMessage("");
@@ -316,7 +317,7 @@ export default function CustomerDashboard() {
       const response = await fetch("/api/customer/service-offers", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ offerId, action, response: offerResponse }),
+        body: JSON.stringify({ offerId, action, response: action === "change_requested" && requestedPrice.trim() ? (() => { const base = Number(requestedPrice); const gst = Math.round(base * gstPercentage) / 100; const total = Math.round((base + gst) * 100) / 100; return `Requested price before GST: ₹${base.toFixed(2)}. GST (${gstPercentage}%): ₹${gst.toFixed(2)}. Requested total including GST: ₹${total.toFixed(2)}.${offerResponse.trim() ? ` Customer note: ${offerResponse.trim()}` : ""}`; })() : offerResponse }),
       });
       const data = await response.json();
       if (!response.ok || !data.success) {
@@ -325,6 +326,7 @@ export default function CustomerDashboard() {
       }
       setOfferMessage(data.message || "Your response has been saved.");
       setOfferResponse("");
+      setRequestedPrice("");
       const [requestsResponse, offersResponse] = await Promise.all([
         fetch("/api/service-requests", { cache: "no-store" }),
         fetch("/api/customer/service-offers", { cache: "no-store" }),
@@ -877,14 +879,24 @@ export default function CustomerDashboard() {
                       {offer.notes && <div className="customerOfferNotes"><small>ADMIN NOTES</small><p>{offer.notes}</p></div>}
                       {offer.status === "sent" && (
                         <div className="offerActions">
-                          <label className="offerResponseLabel">Request changes (optional note)
-                            <textarea value={offerResponse} onChange={event => setOfferResponse(event.target.value)} placeholder="If you need a different date, time, or clarification, explain here." rows={2} />
+                          <div className="requestedPriceBox">
+                            <label className="offerResponseLabel">Your requested price before GST (₹)
+                              <input type="number" min="0.01" step="0.01" value={requestedPrice} onChange={event => setRequestedPrice(event.target.value)} placeholder="Enter the price you want to request" />
+                            </label>
+                            {Number(requestedPrice) > 0 && <div className="requestedPriceBreakdown">
+                              <div><span>Requested price</span><strong>{formatMoney(Number(requestedPrice))}</strong></div>
+                              <div><span>GST ({offer.gstPercentage}%) — calculated automatically</span><strong>{formatMoney(Math.round(Number(requestedPrice) * offer.gstPercentage) / 100)}</strong></div>
+                              <div className="requestedPriceTotal"><span>Requested total</span><strong>{formatMoney(Math.round((Number(requestedPrice) + Math.round(Number(requestedPrice) * offer.gstPercentage) / 100) * 100) / 100)}</strong></div>
+                            </div>}
+                          </div>
+                          <label className="offerResponseLabel">Additional note (optional)
+                            <textarea value={offerResponse} onChange={event => setOfferResponse(event.target.value)} placeholder="Explain why you need this price or mention any schedule changes." rows={2} />
                           </label>
                           {offerError && <div className="offerFeedback offerFeedbackError" role="alert">{offerError}</div>}
                           {offerMessage && <div className="offerFeedback offerFeedbackSuccess" role="status">{offerMessage}</div>}
                           <div className="offerActionButtons">
                             <button className="offerAcceptButton" disabled={offerBusy} onClick={() => void respondToOffer(offer._id, "accepted")}>{offerBusy ? "Please wait…" : "Accept Quoted Offer"}</button>
-                            <button className="offerChangeButton" disabled={offerBusy || !offerResponse.trim()} onClick={() => void respondToOffer(offer._id, "change_requested")}>Request Change</button>
+                            <button className="offerChangeButton" disabled={offerBusy || !(Number(requestedPrice) > 0 || offerResponse.trim())} onClick={() => void respondToOffer(offer._id, "change_requested", offer.gstPercentage ?? 18)}>Request Change</button>
                             <button className="offerRejectButton" disabled={offerBusy} onClick={() => void respondToOffer(offer._id, "rejected")}>Reject Offer</button>
                           </div>
                         </div>
@@ -2445,6 +2457,13 @@ export default function CustomerDashboard() {
         .offerActions { margin-top:16px; }
         .offerResponseLabel { display:block; color:#405a73; font-size:11px; font-weight:700; }
         .offerResponseLabel textarea { width:100%; margin-top:7px; padding:10px; border:1px solid #dbe5ee; border-radius:7px; resize:vertical; font:12px Arial,sans-serif; }
+        .requestedPriceBox { margin:12px 0; padding:12px; border:1px solid #d6e7f4; border-radius:8px; background:#fff; }
+        .offerResponseLabel input { width:100%; margin-top:7px; padding:11px 10px; border:1px solid #dbe5ee; border-radius:7px; color:#173650; font:13px Arial,sans-serif; box-sizing:border-box; }
+        .requestedPriceBreakdown { margin-top:12px; padding:10px; background:#f4f9fd; border-radius:7px; }
+        .requestedPriceBreakdown div { display:flex; align-items:center; justify-content:space-between; gap:10px; padding:5px 0; color:#607991; font-size:11px; }
+        .requestedPriceBreakdown strong { color:#294762; white-space:nowrap; }
+        .requestedPriceBreakdown .requestedPriceTotal { margin-top:5px; padding-top:10px; border-top:1px solid #dbe7f0; color:#17486c; font-weight:800; }
+        .requestedPriceBreakdown .requestedPriceTotal strong { color:#0876c5; font-size:15px; }
         .offerActionButtons { display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; }
         .offerActionButtons button { border:0; border-radius:7px; padding:11px 13px; font-size:11px; font-weight:800; cursor:pointer; }
         .offerActionButtons button:disabled { opacity:.55; cursor:wait; }
