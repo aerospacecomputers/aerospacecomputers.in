@@ -34,6 +34,10 @@ export default function AdminRequestDetailPage() {
   const [notice, setNotice] = useState("");
   const [proposedDate, setProposedDate] = useState("");
   const [proposedTime, setProposedTime] = useState("");
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [dateDraft, setDateDraft] = useState("");
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [timeDraft, setTimeDraft] = useState("09:00");
   const [labourCharges, setLabourCharges] = useState("0");
   const [installationMaterial, setInstallationMaterial] = useState("0");
   const [travelCharges, setTravelCharges] = useState("0");
@@ -55,6 +59,8 @@ export default function AdminRequestDetailPage() {
         const d = new Date(data.offer.proposedDate);
         setProposedDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
         setProposedTime(data.offer.proposedTime || "");
+        setDateDraft(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
+        setTimeDraft(data.offer.proposedTime || "09:00");
         setLabourCharges(String(data.offer.labourCharges ?? 0));
         setInstallationMaterial(String(data.offer.installationMaterial ?? 0));
         setTravelCharges(String(data.offer.travelCharges ?? 0));
@@ -153,8 +159,26 @@ export default function AdminRequestDetailPage() {
               {!canSendOffer ? <div className="noticeBox">This request is currently <strong>{record.status.replace(/_/g, " ")}</strong> and cannot receive a new offer from this screen.</div> : (
                 <form onSubmit={handleSubmit}>
                   <div className="fieldGrid">
-                    <label>Proposed service date<input type="date" value={proposedDate} onChange={e => setProposedDate(e.target.value)} min={new Date().toLocaleDateString("en-CA")} required /></label>
-                    <label>Proposed time<input type="time" value={proposedTime} onChange={e => setProposedTime(e.target.value)} required /></label>
+                    <label>Proposed service date
+                      <div className="pickerField">
+                        <input className="pickerDisplay" type="text" value={proposedDate ? new Date(`${proposedDate}T00:00:00`).toLocaleDateString("en-GB", { day: "2-digit", month: "2-digit", year: "numeric" }) : ""} placeholder="dd/mm/yyyy" readOnly onClick={() => { setDateDraft(proposedDate); setShowDatePicker(true); setShowTimePicker(false); }} required />
+                        {showDatePicker && <div className="inlinePicker" onClick={event => event.stopPropagation()}>
+                          <div className="inlinePickerTitle">Select proposed service date</div>
+                          <input type="date" value={dateDraft} min={new Date().toLocaleDateString("en-CA")} onClick={event => event.currentTarget.showPicker?.()} onChange={event => setDateDraft(event.target.value)} />
+                          <button type="button" className="inlinePickerOk" onClick={() => { setProposedDate(dateDraft); setShowDatePicker(false); }}>OK</button>
+                        </div>}
+                      </div>
+                    </label>
+                    <label>Proposed time
+                      <div className="pickerField">
+                        <input className="pickerDisplay" type="text" value={proposedTime ? proposedTime.slice(0, 5) : ""} placeholder="Select time" readOnly onClick={() => { setTimeDraft(proposedTime || "09:00"); setShowTimePicker(true); setShowDatePicker(false); }} required />
+                        {showTimePicker && <div className="inlinePicker" onClick={event => event.stopPropagation()}>
+                          <div className="inlinePickerTitle">Select proposed time</div>
+                          <input type="time" value={timeDraft} onClick={event => event.currentTarget.showPicker?.()} onChange={event => setTimeDraft(event.target.value)} />
+                          <button type="button" className="inlinePickerOk" onClick={() => { setProposedTime(timeDraft); setShowTimePicker(false); }}>OK</button>
+                        </div>}
+                      </div>
+                    </label>
                   </div>
                   <label>Labour charges (₹)<input type="number" min="0" step="0.01" value={labourCharges} onChange={e => setLabourCharges(e.target.value)} required /></label>
                   <label>Installation / material (₹)<input type="number" min="0" step="0.01" value={installationMaterial} onChange={e => setInstallationMaterial(e.target.value)} required /></label>
