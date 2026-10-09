@@ -62,7 +62,7 @@ export async function POST(request: Request, context: Context) {
         return NextResponse.json({ success: false, message: "There is no customer price request to accept" }, { status: 409 });
       }
 
-      const priceMatch = previousOffer.customerResponse.match(/(?:₹|INR\\s*|Rs\\.?\\s*)([0-9][0-9,]*(?:\\.[0-9]{1,2})?)|([0-9][0-9,]*(?:\\.[0-9]{1,2})?)\\s*(?:rupees|INR|Rs\\.?)/i);
+      const priceMatch = previousOffer.customerResponse.match(/(?:₹|INR\s*|Rs\.?\s*)([0-9][0-9,]*(?:\.[0-9]{1,2})?)|([0-9][0-9,]*(?:\.[0-9]{1,2})?)\s*(?:rupees|INR|Rs\.?)/i);
       const requestedRaw = priceMatch?.[1] || priceMatch?.[2];
       const requestedPrice = requestedRaw ? Number(requestedRaw.replace(/,/g, "")) : NaN;
       if (!Number.isFinite(requestedPrice) || requestedPrice <= 0 || Math.abs(requestedPrice - totalAmount) > 0.01) {
