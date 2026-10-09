@@ -78,7 +78,9 @@ type CustomerOffer = {
   notes?: string;
   status: string;
   customerResponse?: string | null;
+  customerRespondedAt?: string | null;
   createdAt?: string;
+  updatedAt?: string;
 };
 
 function requestStatusLabel(status: string): string {
@@ -303,6 +305,21 @@ export default function CustomerDashboard() {
     const date = new Date(value);
     if (Number.isNaN(date.getTime())) return "—";
     return date.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+  }
+
+  function formatOfferDateTime(value?: string | null) {
+    if (!value) return "—";
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return "—";
+    return date.toLocaleString("en-IN", { day: "2-digit", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit" });
+  }
+
+  function requestedTotalFromResponse(value?: string | null) {
+    if (!value) return null;
+    const match = value.match(/Requested total including GST:\s*₹\s*([0-9,]+(?:\.[0-9]{1,2})?)/i);
+    if (!match) return null;
+    const amount = Number(match[1].replace(/,/g, ""));
+    return Number.isFinite(amount) ? amount : null;
   }
 
   function formatMoney(value?: number) {
@@ -859,10 +876,10 @@ export default function CustomerDashboard() {
                     <p>{selectedRequest.description || "No description provided."}</p>
                   </div>
 
-                  {offers.filter(offer => offer.serviceRequestId === selectedRequest._id).map(offer => (
+                  {offers.filter(offer => offer.serviceRequestId === selectedRequest._id).slice().sort((a, b) => new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime()).map((offer, offerIndex) => (
                     <section className="customerOfferPanel" key={offer._id}>
                       <div className="customerOfferHeader">
-                        <div><small>SERVICE OFFER</small><h3>Proposed schedule & price</h3></div>
+                        <div><small>SERVICE OFFER {offerIndex + 1}</small><h3>Proposed schedule & price</h3><span className="offerTimelineTime">Offer sent: {formatOfferDateTime(offer.createdAt)}</span></div>
                         <em className={`status ${offer.status === "sent" ? "purple" : offer.status === "accepted" ? "green" : offer.status === "rejected" ? "red" : "orange"}`}>{offer.status.replace(/_/g, " ")}</em>
                       </div>
                       <div className="customerOfferGrid">
@@ -877,6 +894,12 @@ export default function CustomerDashboard() {
                       </div>
                       <div className="customerOfferTotal"><span>Total quoted price</span><strong>{formatMoney(offer.totalAmount)}</strong></div>
                       {offer.notes && <div className="customerOfferNotes"><small>ADMIN NOTES</small><p>{offer.notes}</p></div>}
+                      {offer.customerRespondedAt && <div className={`offerTimelineResponse ${offer.status === "change_requested" ? "offerTimelineChange" : ""}`}>
+                        <strong>{offer.status === "change_requested" ? "Customer requested a change" : offer.status === "accepted" ? "Customer accepted this offer" : offer.status === "rejected" ? "Customer rejected this offer" : "Customer response"}</strong>
+                        <span>{formatOfferDateTime(offer.customerRespondedAt)}</span>
+                        {requestedTotalFromResponse(offer.customerResponse) !== null && <div className="offerTimelinePrice">Customer requested total (including GST): <strong>{formatMoney(requestedTotalFromResponse(offer.customerResponse)!)}</strong></div>}
+                        {offer.customerResponse && <p>{offer.customerResponse.replace(/Requested total including GST:\s*₹\s*[0-9,]+(?:\.[0-9]{1,2})?\.\s*/i, "").replace(/Requested price before GST:\s*₹\s*[0-9,]+(?:\.[0-9]{1,2})?\.\s*/i, "").replace(/GST \([0-9.]+%\):\s*₹\s*[0-9,]+(?:\.[0-9]{1,2})?\.\s*/i, "").replace(/^Customer note:\s*/i, "")}</p>}
+                      </div>}
                       {offer.status === "sent" && (
                         <div className="offerActions">
                           <div className="requestedPriceBox">
@@ -2448,6 +2471,15 @@ export default function CustomerDashboard() {
         .customerOfferHeader { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:16px; }
         .customerOfferHeader small,.customerOfferGrid small,.customerOfferNotes small { display:block; color:#0876c5; font-size:9px; font-weight:800; letter-spacing:.9px; }
         .customerOfferHeader h3 { margin:5px 0 0; color:#173858; font-size:16px; }
+        .offerTimelineTime { display:block; margin-top:6px; color:#8295a8; font-size:10px; }
+        .offerTimelineResponse { display:grid; gap:6px; margin-top:13px; padding:12px; border-radius:8px; background:#f1f8ff; border:1px solid #d7e9f7; color:#345773; }
+        .offerTimelineResponse strong { font-size:11px; color:#176da9; }
+        .offerTimelineResponse span { font-size:10px; color:#7289a0; }
+        .offerTimelineResponse p { margin:0; font-size:11px; line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; }
+        .offerTimelineChange { background:#fff8e9; border-color:#f2dfb4; }
+        .offerTimelineChange strong { color:#a66308; }
+        .offerTimelinePrice { margin-top:3px; font-size:11px; color:#36536e; }
+        .offerTimelinePrice strong { color:#0876c5; font-size:13px; }
         .customerOfferGrid { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
         .customerOfferGrid strong { display:block; color:#3b5872; font-size:12px; margin-top:5px; overflow-wrap:anywhere; }
         .customerOfferTotal { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:14px; margin-top:16px; background:#eaf6ff; border-radius:8px; color:#17486c; font-size:12px; font-weight:800; }
