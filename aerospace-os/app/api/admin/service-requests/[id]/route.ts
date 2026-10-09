@@ -21,12 +21,13 @@ export async function GET(_request: Request, context: Context) {
     const serviceRequest = await ServiceRequest.findById(id).lean();
     if (!serviceRequest) return NextResponse.json({ success: false, message: "Service request not found" }, { status: 404 });
 
-    const [customer, offer] = await Promise.all([
+    const [customer, offers] = await Promise.all([
       User.findById(serviceRequest.customerId).select("name email phone customerType companyId").lean(),
-      ServiceOffer.findOne({ serviceRequestId: serviceRequest._id }).sort({ createdAt: -1 }).lean(),
+      ServiceOffer.find({ serviceRequestId: serviceRequest._id }).sort({ createdAt: 1 }).lean(),
     ]);
+    const offer = offers.length ? offers[offers.length - 1] : null;
 
-    return NextResponse.json({ success: true, request: serviceRequest, customer, offer });
+    return NextResponse.json({ success: true, request: serviceRequest, customer, offer, offers });
   } catch (error) {
     console.error("Admin request detail error:", error);
     return NextResponse.json({ success: false, message: "Unable to load service request" }, { status: 500 });
