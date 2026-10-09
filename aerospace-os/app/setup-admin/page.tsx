@@ -6,6 +6,7 @@ export default function SetupAdminPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [setupSecret, setSetupSecret] = useState("");
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
@@ -52,7 +53,10 @@ export default function SetupAdminPage() {
         <label style={labelStyle}>Administrator email</label>
         <input style={inputStyle} type="email" value={email} onChange={e => setEmail(e.target.value)} autoComplete="email" required />
         <label style={labelStyle}>Strong password (at least 12 characters)</label>
-        <input style={inputStyle} type="password" value={password} onChange={e => setPassword(e.target.value)} minLength={12} autoComplete="new-password" required />
+        <div style={{ display: "flex", gap: 8, alignItems: "stretch" }}>
+          <input style={{ ...inputStyle, flex: 1, minWidth: 0 }} type={showPassword ? "text" : "password"} value={password} onChange={e => setPassword(e.target.value)} minLength={12} autoComplete="new-password" required />
+          <button type="button" onClick={() => setShowPassword(!showPassword)} aria-label={showPassword ? "Hide password" : "Show password"} style={{ padding: "0 13px", border: "1px solid #cbd6e2", borderRadius: 8, background: "#f8fafc", color: "#1769aa", fontWeight: 600, cursor: "pointer", whiteSpace: "nowrap" }}>{showPassword ? "Hide" : "Show"}</button>
+        </div>
         <label style={labelStyle}>Admin setup secret</label>
         <input style={inputStyle} type="password" value={setupSecret} onChange={e => setSetupSecret(e.target.value)} autoComplete="off" required />
         {error && <p role="alert" style={{ color: "#b42318", background: "#fff0ef", padding: 12, borderRadius: 8 }}>{error}</p>}
