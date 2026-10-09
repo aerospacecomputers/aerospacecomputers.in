@@ -295,7 +295,7 @@ export default function AdminRequestDetailPage() {
                 <button type="button" onClick={() => void agreeToCustomerPrice()} disabled={quickAccepting || !requestedPriceFromResponse(offer.customerResponse)}>{quickAccepting ? "Sending…" : "OK — Agree & Send Price"}</button>
               </section>}
             </div>
-            <section className="card offerCard">
+            {!ticket && <section className="card offerCard">
               <div className="formHeading"><div><p className="eyebrow">ADMIN ACTION</p><h2>{offer ? "Prepare revised offer" : "Prepare service offer"}</h2></div><span className="lock">Admin only</span></div>
               {!canSendOffer ? <div className="noticeBox">This request is currently <strong>{record.status.replace(/_/g, " ")}</strong> and cannot receive a new offer from this screen.</div> : (
                 <form onSubmit={handleSubmit}>
@@ -338,7 +338,7 @@ export default function AdminRequestDetailPage() {
                   <p className="hint">The customer must review and respond to the exact date, time and price. Ticket creation and engineer assignment remain separate admin actions.</p>
                 </form>
               )}
-            </section>
+            </section>}
           </div>
         </>
       )}
