@@ -5,6 +5,7 @@ import { getCurrentSession } from "@/lib/auth";
 import ServiceRequest from "@/lib/models/ServiceRequest";
 import ServiceOffer from "@/lib/models/ServiceOffer";
 import User from "@/lib/models/User";
+import Ticket from "@/lib/models/Ticket";
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -44,6 +45,53 @@ export async function POST(request: Request, context: Context) {
     if (!mongoose.isValidObjectId(id)) return NextResponse.json({ success: false, message: "Invalid request ID" }, { status: 400 });
 
     const body = await request.json();
+
+    if (body.action === "create_ticket") {
+      await connectMongoDB();
+      const serviceRequest = await ServiceRequest.findById(id);
+      if (!serviceRequest) return NextResponse.json({ success: false, message: "Service request not found" }, { status: 404 });
+
+      const existingTicket = await Ticket.findOne({ serviceRequestId: serviceRequest._id });
+      if (existingTicket) {
+        return NextResponse.json({ success: false, message: "A ticket already exists for this service request", ticket: existingTicket }, { status: 409 });
+      }
+      if (serviceRequest.status !== "accepted") {
+        return NextResponse.json({ success: false, message: "The customer must accept an offer before a ticket can be created" }, { status: 409 });
+      }
+
+      const acceptedOffer = await ServiceOffer.findOne({
+        serviceRequestId: serviceRequest._id,
+        customerId: serviceRequest.customerId,
+        status: "accepted",
+      }).sort({ customerRespondedAt: -1, createdAt: -1 });
+      if (!acceptedOffer) {
+        return NextResponse.json({ success: false, message: "No customer-accepted offer was found for this request" }, { status: 409 });
+      }
+
+      const ticketNumber = `TKT-${new Date().toISOString().slice(0, 10).replace(/-/g, "")}-${String(Math.floor(Math.random() * 900000) + 100000)}`;
+      const ticket = await Ticket.create({
+        ticketNumber,
+        serviceRequestId: serviceRequest._id,
+        serviceOfferId: acceptedOffer._id,
+        customerId: serviceRequest.customerId,
+        engineerId: null,
+        status: "created",
+        scheduledDate: acceptedOffer.proposedDate,
+        scheduledTime: acceptedOffer.proposedTime,
+        approvedAmount: acceptedOffer.totalAmount,
+        customerAcceptedAt: acceptedOffer.customerRespondedAt || new Date(),
+        ticketCreatedAt: new Date(),
+      });
+
+      serviceRequest.status = "ticket_created";
+      await serviceRequest.save();
+
+      return NextResponse.json({
+        success: true,
+        message: "Ticket created from the customer's accepted offer. Engineer assignment is still pending.",
+        ticket,
+      }, { status: 201 });
+    }
 
     if (body.action === "agree_customer_price") {
       const totalAmount = Number(body.totalAmount);
