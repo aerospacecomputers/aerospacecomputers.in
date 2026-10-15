@@ -33,6 +33,17 @@ function dayKey(value?: string | null) {
   if (Number.isNaN(d.getTime())) return "";
   return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 }
+function timeKey(value?: string | null) {
+  if (!value) return Number.MAX_SAFE_INTEGER;
+  const match = value.trim().match(/^(\\d{1,2}):(\\d{2})\\s*(AM|PM)?$/i);
+  if (!match) return Number.MAX_SAFE_INTEGER;
+  let hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  const meridiem = match[3]?.toUpperCase();
+  if (meridiem) hours = (hours % 12) + (meridiem === "PM" ? 12 : 0);
+  if (hours > 23 || minutes > 59) return Number.MAX_SAFE_INTEGER;
+  return hours * 60 + minutes;
+}
 function shiftDay(days: number) {
   const d = new Date();
   d.setDate(d.getDate() + days);
@@ -103,7 +114,7 @@ export default function EngineerDashboardPage() {
 
   const todayKey = dayKey(new Date().toISOString());
   const overdueTickets = tickets.filter((t) => !closedStatuses.includes(t.status) && dayKey(t.scheduledDate) !== "" && dayKey(t.scheduledDate) < todayKey);
-  const todayTickets = tickets.filter((t) => dayKey(t.scheduledDate) === todayKey && !closedStatuses.includes(t.status));
+  const todayTickets = tickets.filter((t) => dayKey(t.scheduledDate) === todayKey && !closedStatuses.includes(t.status)).sort((a, b) => timeKey(a.scheduledTime) - timeKey(b.scheduledTime));
   const recentTickets = [...tickets].sort((a, b) => new Date(b.updatedAt || b.createdAt || 0).getTime() - new Date(a.updatedAt || a.createdAt || 0).getTime()).slice(0, 4);
   const visibleTickets = tickets.filter((ticket) => {
     const scheduled = dayKey(ticket.scheduledDate);
