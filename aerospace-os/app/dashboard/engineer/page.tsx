@@ -58,7 +58,7 @@ function date(value?: string | null) {
   return Number.isNaN(d.getTime()) ? "Not scheduled" : d.toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" });
 }
 function displayTicketNumber(value: string) {
-  return value.replace(/^(TKT-)\\d{8}-/, "$1");
+  return value.replace(/^(TKT-)\d{8}-/, "$1");
 }
 function label(value: string) {
   return value.replace(/_/g, " ").replace(/\b\w/g, (part) => part.toUpperCase());
