@@ -223,6 +223,7 @@ export default function CustomerDashboard() {
   const [subject, setSubject] = useState("");
   const [service, setService] = useState("");
   const [description, setDescription] = useState("");
+  const [serviceLocation, setServiceLocation] = useState("");
   const [preferredDate, setPreferredDate] = useState("");
   const [preferredTime, setPreferredTime] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -380,6 +381,7 @@ export default function CustomerDashboard() {
           subject,
           serviceType: service,
           description,
+          serviceLocation,
           preferredDate: preferredDate || null,
           preferredTime: preferredTime || null,
           deviceIds: selectedDeviceIds,
@@ -398,6 +400,7 @@ export default function CustomerDashboard() {
       setSubject("");
       setService("");
       setDescription("");
+      setServiceLocation("");
       setPreferredDate("");
       setPreferredTime("");
     } catch (error) {
@@ -1130,6 +1133,12 @@ export default function CustomerDashboard() {
                           </div>
                         )}
                       </div>
+                    </label>
+
+                    <label className="full">
+                      Service location (optional)
+                      <input value={serviceLocation} onChange={(e) => setServiceLocation(e.target.value)} placeholder="Address, building, floor, landmark, or Google Maps link" maxLength={1000} />
+                      <small>Share where the technician should visit. You can paste a Google Maps link.</small>
                     </label>
 
                     <label className="full">
