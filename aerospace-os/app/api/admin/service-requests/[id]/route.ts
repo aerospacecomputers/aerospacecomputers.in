@@ -71,6 +71,8 @@ export async function POST(request: Request, context: Context) {
       const paymentPlan = String(body.paymentPlan || "");
       const serviceLocation = typeof body.serviceLocation === "string" ? body.serviceLocation.trim().slice(0, 1000) : "";
       const serviceMapUrl = typeof body.serviceMapUrl === "string" ? body.serviceMapUrl.trim().slice(0, 2000) : "";
+      const saveLocationForCustomer = body.saveLocationForCustomer === true;
+      const locationLabel = typeof body.locationLabel === "string" ? body.locationLabel.trim().slice(0, 100) : "";
       if (!validPaymentPlans.includes(paymentPlan as (typeof validPaymentPlans)[number])) {
         return NextResponse.json({ success: false, message: "Choose a valid payment arrangement" }, { status: 400 });
       }
@@ -107,6 +109,15 @@ export async function POST(request: Request, context: Context) {
 
       serviceRequest.status = "assigned";
       await serviceRequest.save();
+
+      if (saveLocationForCustomer && locationLabel && serviceLocation) {
+        const profile = await CustomerProfile.findOne({ userId: serviceRequest.customerId });
+        if (profile) {
+          const existing = (profile.savedLocations || []).filter((item: { label?: string; address?: string }) => !(item.label?.toLowerCase() === locationLabel.toLowerCase() && item.address === serviceLocation));
+          profile.savedLocations = [...existing, { label: locationLabel, address: serviceLocation, mapUrl: serviceMapUrl }].slice(-30) as typeof profile.savedLocations;
+          await profile.save();
+        }
+      }
 
       return NextResponse.json({
         success: true,
