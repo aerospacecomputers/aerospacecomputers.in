@@ -16,7 +16,7 @@ export async function GET() {
     await connectMongoDB();
     const engineer = await User.findById(session.userId).select("name email").lean();
     const records = await Ticket.find({ engineerId: session.userId })
-      .populate({ path: "serviceRequestId", select: "requestNumber subject description serviceType preferredDate preferredTime status attachmentUrls serviceLocation" })
+      .populate({ path: "serviceRequestId", select: "requestNumber subject description serviceType preferredDate preferredTime status attachmentUrls serviceLocation serviceMapUrl" })
       .populate({ path: "customerId", select: "name email phone customerType companyId" })
       .sort({ engineerAssignedAt: -1, updatedAt: -1 }).lean();
     const tickets = records.map((ticket) => {
