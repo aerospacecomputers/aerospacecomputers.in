@@ -18,7 +18,7 @@ type RequestRecord = {
 type Customer = { name?: string; email?: string; phone?: string; customerType?: string; companyId?: string | null } | null;
 type Offer = { proposedDate: string; proposedTime: string; labourCharges: number; installationMaterial: number; travelCharges: number; otherCharges: number; subtotal: number; gstPercentage: number; gstAmount: number; totalAmount: number; status: string; notes?: string; customerResponse?: string | null; customerRespondedAt?: string | null; createdAt?: string; updatedAt?: string } | null;
 type OfferHistoryItem = NonNullable<Offer>;
-type TicketRecord = { _id: string; ticketNumber: string; status: string; approvedAmount: number; ticketCreatedAt?: string; engineerId?: string | null; engineerAssignedAt?: string | null } | null;
+type TicketRecord = { _id: string; ticketNumber: string; status: string; approvedAmount: number; ticketCreatedAt?: string; engineerId?: string | null; engineerAssignedAt?: string | null; paymentCollectionRequestedAt?: string | null; paymentCollectionApprovedAt?: string | null } | null;
 type EngineerOption = { _id: string; name: string; email: string; phone?: string };
 
 const money = (value: number) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(value || 0);
@@ -157,6 +157,25 @@ export default function AdminRequestDetailPage() {
     }
   }
 
+  async function approvePaymentCollection() {
+    if (!ticket || !ticket.paymentCollectionRequestedAt || ticket.paymentCollectionApprovedAt) return;
+    if (!window.confirm(`Approve showing the customer charge for ticket ${ticket.ticketNumber} to its assigned engineer?`)) return;
+    setSaving(true);
+    setError("");
+    setNotice("");
+    try {
+      const response = await fetch(`/api/admin/service-requests/${id}`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ action: "approve_payment_collection" }) });
+      const data = await response.json();
+      if (!response.ok || !data.success) throw new Error(data.message || "Could not approve payment collection.");
+      setNotice(data.message || "Payment collection approved.");
+      await load();
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Could not approve payment collection.");
+    } finally {
+      setSaving(false);
+    }
+  }
+
   async function createTicket() {
     if (!record || record.status !== "accepted" || ticket) return;
     if (!window.confirm("Create a ticket from the customer's accepted offer? Engineer assignment will remain a separate step.")) return;
@@ -239,7 +258,8 @@ export default function AdminRequestDetailPage() {
             <button type="button" className="send" onClick={() => void assignEngineer()} disabled={assigningEngineer || !selectedEngineer || engineers.length === 0}>{assigningEngineer ? "Assigning…" : ticket.engineerId ? "Update Assignment" : "Assign Engineer"}</button>
           </section>}
           {ticket && <section className="card ticketActionCard ticketCreatedCard">
-            <div><p className="eyebrow">TICKET CREATED</p><h2>{ticket.ticketNumber}</h2><p className="muted small">Status: {ticket.status.replace(/_/g, " ")} · Approved amount: {money(ticket.approvedAmount)} · {ticket.engineerId ? "Engineer assigned" : "Engineer assignment pending"}</p></div>
+            <div><p className="eyebrow">TICKET CREATED</p><h2>{ticket.ticketNumber}</h2><p className="muted small">Status: {ticket.status.replace(/_/g, " ")} · Approved amount: {money(ticket.approvedAmount)} · {ticket.engineerId ? "Engineer assigned" : "Engineer assignment pending"}</p>{ticket.paymentCollectionRequestedAt ? <p className="muted small">Payment collection: {ticket.paymentCollectionApprovedAt ? "Approved — charge visible to engineer" : "Awaiting admin approval"}</p> : <p className="muted small">The engineer has not requested payment collection approval.</p>}</div>
+            {ticket.paymentCollectionRequestedAt && !ticket.paymentCollectionApprovedAt && <button type="button" className="send" onClick={() => void approvePaymentCollection()} disabled={saving}>{saving ? "Approving…" : "Approve Charge Visibility"}</button>}
           </section>}
           {offerHistory.length > 0 && <section className="card offerHistoryCard">
             <h2>Offer & price change history</h2>
