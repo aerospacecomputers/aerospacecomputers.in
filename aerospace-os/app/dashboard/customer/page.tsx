@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 
+type SavedServiceLocation = { label: string; address: string; mapUrl?: string };
+
 type Page =
   | "dashboard"
   | "new-request"
@@ -224,6 +226,11 @@ export default function CustomerDashboard() {
   const [service, setService] = useState("");
   const [description, setDescription] = useState("");
   const [serviceLocation, setServiceLocation] = useState("");
+  const [serviceMapUrl, setServiceMapUrl] = useState("");
+  const [savedServiceLocations, setSavedServiceLocations] = useState<SavedServiceLocation[]>([]);
+  const [selectedServiceLocation, setSelectedServiceLocation] = useState("");
+  const [saveServiceLocation, setSaveServiceLocation] = useState(false);
+  const [serviceLocationLabel, setServiceLocationLabel] = useState("");
   const [preferredDate, setPreferredDate] = useState("");
   const [preferredTime, setPreferredTime] = useState("");
   const [submitted, setSubmitted] = useState(false);
@@ -274,6 +281,7 @@ export default function CustomerDashboard() {
           setProfile(loadedProfile);
           setProfileDraft(loadedProfile);
           setDevices(Array.isArray(data.devices) ? data.devices : []);
+          setSavedServiceLocations(Array.isArray(data.profile.savedLocations) ? data.profile.savedLocations : []);
         }
 
         const requestsResponse = await fetch("/api/service-requests", { cache: "no-store" });
@@ -382,6 +390,7 @@ export default function CustomerDashboard() {
           serviceType: service,
           description,
           serviceLocation,
+          serviceMapUrl,
           preferredDate: preferredDate || null,
           preferredTime: preferredTime || null,
           deviceIds: selectedDeviceIds,
@@ -396,11 +405,22 @@ export default function CustomerDashboard() {
         return;
       }
 
+      if (saveServiceLocation && serviceLocation.trim() && serviceLocationLabel.trim()) {
+        const existing = savedServiceLocations.filter((item) => !(item.label.toLowerCase() === serviceLocationLabel.trim().toLowerCase() && item.address === serviceLocation.trim()));
+        const nextLocations = [...existing, { label: serviceLocationLabel.trim(), address: serviceLocation.trim(), mapUrl: serviceMapUrl.trim() }].slice(-30);
+        const profileResponse = await fetch("/api/customer/dashboard", { method: "PATCH", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ name: profile.name, phone: profile.phone, address: profile.address, savedLocations: nextLocations }) });
+        const profileData = await profileResponse.json();
+        if (profileResponse.ok && profileData.success) setSavedServiceLocations(nextLocations);
+      }
       setSubmitted(true);
       setSubject("");
       setService("");
       setDescription("");
       setServiceLocation("");
+      setServiceMapUrl("");
+      setSelectedServiceLocation("");
+      setSaveServiceLocation(false);
+      setServiceLocationLabel("");
       setPreferredDate("");
       setPreferredTime("");
     } catch (error) {
@@ -1137,8 +1157,12 @@ export default function CustomerDashboard() {
 
                     <label className="full">
                       Service location (optional)
-                      <input value={serviceLocation} onChange={(e) => setServiceLocation(e.target.value)} placeholder="Address, building, floor, landmark, or Google Maps link" maxLength={1000} />
-                      <small>Share where the technician should visit. You can paste a Google Maps link.</small>
+                      {savedServiceLocations.length > 0 && <select value={selectedServiceLocation} onChange={(e) => { const value = e.target.value; setSelectedServiceLocation(value); const saved = savedServiceLocations.find((item) => item.label === value); if (saved) { setServiceLocation(saved.address); setServiceMapUrl(saved.mapUrl || ""); setServiceLocationLabel(saved.label); } else { setServiceLocation(""); setServiceMapUrl(""); setServiceLocationLabel(""); } }}><option value="">Add a new location or choose saved location</option>{savedServiceLocations.map((item) => <option key={`${item.label}-${item.address}`} value={item.label}>{item.label} — {item.address}</option>)}</select>}
+                      <input value={serviceLocation} onChange={(e) => { setServiceLocation(e.target.value); setSelectedServiceLocation(""); }} placeholder="Full address, factory, office, floor, landmark" maxLength={1000} />
+                      <input value={serviceMapUrl} onChange={(e) => setServiceMapUrl(e.target.value)} placeholder="Google Maps link (optional)" maxLength={2000} />
+                      <small>Enter a clear address. A map link is optional and will not be shown as text to the engineer.</small>
+                      <label style={{display:"flex",alignItems:"center",gap:"8px",marginTop:"8px"}}><input type="checkbox" checked={saveServiceLocation} onChange={(e) => setSaveServiceLocation(e.target.checked)} /> Save this location for future service requests</label>
+                      {saveServiceLocation && <input value={serviceLocationLabel} onChange={(e) => setServiceLocationLabel(e.target.value)} placeholder="Location name, e.g. Gurgaon Factory" maxLength={100} />}
                     </label>
 
                     <label className="full">
