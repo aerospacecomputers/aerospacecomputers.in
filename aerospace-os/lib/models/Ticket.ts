@@ -37,6 +37,9 @@ export interface ITicket {
   adminNotes?: string | null;
   engineerNotes?: string | null;
 
+  paymentCollectionRequestedAt?: Date | null;
+  paymentCollectionApprovedAt?: Date | null;
+
   completedAt?: Date | null;
   closedAt?: Date | null;
 
@@ -138,6 +141,16 @@ const TicketSchema = new Schema<ITicket>(
 
     engineerNotes: {
       type: String,
+      default: null,
+    },
+
+    paymentCollectionRequestedAt: {
+      type: Date,
+      default: null,
+    },
+
+    paymentCollectionApprovedAt: {
+      type: Date,
       default: null,
     },
 
