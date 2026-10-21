@@ -18,7 +18,7 @@ type RequestRecord = {
 type Customer = { name?: string; email?: string; phone?: string; customerType?: string; companyId?: string | null } | null;
 type Offer = { proposedDate: string; proposedTime: string; labourCharges: number; installationMaterial: number; travelCharges: number; otherCharges: number; subtotal: number; gstPercentage: number; gstAmount: number; totalAmount: number; status: string; notes?: string; customerResponse?: string | null; customerRespondedAt?: string | null; createdAt?: string; updatedAt?: string } | null;
 type OfferHistoryItem = NonNullable<Offer>;
-type TicketRecord = { _id: string; ticketNumber: string; status: string; approvedAmount: number; ticketCreatedAt?: string; engineerId?: string | null; engineerAssignedAt?: string | null; paymentCollectionRequestedAt?: string | null; paymentCollectionApprovedAt?: string | null } | null;
+type TicketRecord = { _id: string; ticketNumber: string; status: string; approvedAmount: number; ticketCreatedAt?: string; engineerId?: string | null; engineerAssignedAt?: string | null; paymentPlan?: "collect_on_visit" | "already_collected" | "amc_covered" | "pay_later" | null; paymentCollectionRequestedAt?: string | null; paymentCollectionApprovedAt?: string | null } | null;
 type EngineerOption = { _id: string; name: string; email: string; phone?: string };
 
 const money = (value: number) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(value || 0);
@@ -36,6 +36,7 @@ export default function AdminRequestDetailPage() {
   const [ticket, setTicket] = useState<TicketRecord>(null);
   const [engineers, setEngineers] = useState<EngineerOption[]>([]);
   const [selectedEngineer, setSelectedEngineer] = useState("");
+  const [paymentPlan, setPaymentPlan] = useState<"collect_on_visit" | "already_collected" | "amc_covered" | "pay_later">("collect_on_visit");
   const [assigningEngineer, setAssigningEngineer] = useState(false);
   const [creatingTicket, setCreatingTicket] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -70,6 +71,7 @@ export default function AdminRequestDetailPage() {
       setTicket(data.ticket || null);
       setEngineers(Array.isArray(data.engineers) ? data.engineers : []);
       setSelectedEngineer(data.ticket?.engineerId ? String(data.ticket.engineerId) : "");
+      setPaymentPlan(data.ticket?.paymentPlan || "collect_on_visit");
       if (data.offer) {
         const d = new Date(data.offer.proposedDate);
         setProposedDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
@@ -144,7 +146,7 @@ export default function AdminRequestDetailPage() {
       const response = await fetch(`/api/admin/service-requests/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "assign_engineer", engineerId: selectedEngineer }),
+        body: JSON.stringify({ action: "assign_engineer", engineerId: selectedEngineer, paymentPlan }),
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.message || "Could not assign engineer.");
@@ -248,6 +250,14 @@ export default function AdminRequestDetailPage() {
               <p className="eyebrow">ENGINEER ASSIGNMENT</p>
               <h2>{ticket.engineerId ? "Change assigned engineer" : "Assign an engineer"}</h2>
               <p className="muted small">Ticket {ticket.ticketNumber} · {ticket.engineerId ? "An engineer is currently assigned." : "No engineer is assigned yet."}</p>
+              <label className="engineerSelectLabel">Payment arrangement
+                <select value={paymentPlan} onChange={(event) => setPaymentPlan(event.target.value as typeof paymentPlan)} required>
+                  <option value="collect_on_visit">Engineer must collect payment from customer</option>
+                  <option value="already_collected">Payment already collected by admin/company</option>
+                  <option value="amc_covered">Covered under AMC — no payment to collect</option>
+                  <option value="pay_later">Customer will pay later — do not collect now</option>
+                </select>
+              </label>
               {engineers.length === 0 ? <p className="muted small">No active engineer accounts are available. Create or activate an engineer account first.</p> : <label className="engineerSelectLabel">Active engineer
                 <select value={selectedEngineer} onChange={(event) => setSelectedEngineer(event.target.value)} required>
                   <option value="">Select an engineer</option>
@@ -258,7 +268,7 @@ export default function AdminRequestDetailPage() {
             <button type="button" className="send" onClick={() => void assignEngineer()} disabled={assigningEngineer || !selectedEngineer || engineers.length === 0}>{assigningEngineer ? "Assigning…" : ticket.engineerId ? "Update Assignment" : "Assign Engineer"}</button>
           </section>}
           {ticket && <section className="card ticketActionCard ticketCreatedCard">
-            <div><p className="eyebrow">TICKET CREATED</p><h2>{ticket.ticketNumber}</h2><p className="muted small">Status: {ticket.status.replace(/_/g, " ")} · Approved amount: {money(ticket.approvedAmount)} · {ticket.engineerId ? "Engineer assigned" : "Engineer assignment pending"}</p>{ticket.paymentCollectionRequestedAt ? <p className="muted small">Payment collection: {ticket.paymentCollectionApprovedAt ? "Approved — charge visible to engineer" : "Awaiting admin approval"}</p> : <p className="muted small">The engineer has not requested payment collection approval.</p>}</div>
+            <div><p className="eyebrow">TICKET CREATED</p><h2>{ticket.ticketNumber}</h2><p className="muted small">Status: {ticket.status.replace(/_/g, " ")} · Customer charge: {ticket.paymentPlan === "collect_on_visit" ? "Engineer to collect on visit" : ticket.paymentPlan === "already_collected" ? "Already collected" : ticket.paymentPlan === "amc_covered" ? "AMC covered — no collection" : ticket.paymentPlan === "pay_later" ? "Customer pays later" : "Payment arrangement not set"} · {ticket.engineerId ? "Engineer assigned" : "Engineer assignment pending"}</p>{ticket.paymentCollectionRequestedAt ? <p className="muted small">Payment collection: {ticket.paymentCollectionApprovedAt ? "Approved — charge visible to engineer" : "Awaiting admin approval"}</p> : <p className="muted small">The engineer has not requested payment collection approval.</p>}</div>
             {ticket.paymentCollectionRequestedAt && !ticket.paymentCollectionApprovedAt && <button type="button" className="send" onClick={() => void approvePaymentCollection()} disabled={saving}>{saving ? "Approving…" : "Approve Charge Visibility"}</button>}
           </section>}
           {offerHistory.length > 0 && <section className="card offerHistoryCard">
