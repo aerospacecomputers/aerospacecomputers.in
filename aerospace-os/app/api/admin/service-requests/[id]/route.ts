@@ -67,6 +67,7 @@ export async function POST(request: Request, context: Context) {
       const engineerId = String(body.engineerId || "");
       const validPaymentPlans = ["collect_on_visit", "already_collected", "amc_covered", "pay_later"] as const;
       const paymentPlan = String(body.paymentPlan || "");
+      const serviceLocation = typeof body.serviceLocation === "string" ? body.serviceLocation.trim().slice(0, 1000) : "";
       if (!validPaymentPlans.includes(paymentPlan as (typeof validPaymentPlans)[number])) {
         return NextResponse.json({ success: false, message: "Choose a valid payment arrangement" }, { status: 400 });
       }
@@ -89,6 +90,8 @@ export async function POST(request: Request, context: Context) {
 
       ticket.engineerId = engineer._id;
       ticket.paymentPlan = paymentPlan as (typeof validPaymentPlans)[number];
+      if (serviceLocation) ticket.serviceLocation = serviceLocation;
+      else if (!ticket.serviceLocation && serviceRequest.serviceLocation) ticket.serviceLocation = serviceRequest.serviceLocation;
       if (ticket.paymentPlan !== "collect_on_visit") {
         ticket.paymentCollectionRequestedAt = null;
         ticket.paymentCollectionApprovedAt = null;
