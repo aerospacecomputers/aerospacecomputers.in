@@ -107,6 +107,7 @@ export async function POST(request: Request) {
 
       description: body.description.trim(),
       serviceLocation: typeof body.serviceLocation === "string" ? body.serviceLocation.trim().slice(0, 1000) || null : null,
+      serviceMapUrl: typeof body.serviceMapUrl === "string" ? body.serviceMapUrl.trim().slice(0, 2000) || null : null,
 
       serviceType: body.serviceType?.trim() || "",
 
