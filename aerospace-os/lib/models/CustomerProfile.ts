@@ -16,6 +16,7 @@ export interface ICustomerProfile {
   city?: string;
   state?: string;
   pincode?: string;
+  savedLocations?: { label: string; address: string; mapUrl?: string }[];
 
   notes?: string;
 
@@ -87,6 +88,12 @@ const CustomerProfileSchema = new Schema<ICustomerProfile>(
       type: String,
       default: "",
     },
+
+    savedLocations: [{
+      label: { type: String, trim: true, maxlength: 100 },
+      address: { type: String, trim: true, maxlength: 1000 },
+      mapUrl: { type: String, trim: true, maxlength: 2000, default: "" },
+    }],
 
     notes: {
       type: String,
