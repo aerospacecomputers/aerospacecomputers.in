@@ -76,7 +76,9 @@ export async function POST(request: Request) {
       serviceRequest.status = status === "completed" ? "completed" : "in_progress";
       await serviceRequest.save();
     }
-    return NextResponse.json({ success: true, message: "Ticket status updated", ticket });
+    const ticketResponse = ticket.toObject();
+    if (!ticket.paymentCollectionApprovedAt) delete (ticketResponse as Partial<typeof ticketResponse>).approvedAmount;
+    return NextResponse.json({ success: true, message: "Ticket status updated", ticket: ticketResponse });
   } catch (error) {
     console.error("Engineer ticket update error:", error);
     return NextResponse.json({ success: false, message: "Unable to update ticket" }, { status: 500 });
