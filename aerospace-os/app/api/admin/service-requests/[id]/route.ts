@@ -48,6 +48,20 @@ export async function POST(request: Request, context: Context) {
 
     const body = await request.json();
 
+    if (body.action === "approve_payment_collection") {
+      await connectMongoDB();
+      const serviceRequest = await ServiceRequest.findById(id);
+      if (!serviceRequest) return NextResponse.json({ success: false, message: "Service request not found" }, { status: 404 });
+      const ticket = await Ticket.findOne({ serviceRequestId: serviceRequest._id });
+      if (!ticket) return NextResponse.json({ success: false, message: "Ticket not found" }, { status: 404 });
+      if (!ticket.engineerId) return NextResponse.json({ success: false, message: "Assign an engineer before approving payment collection" }, { status: 409 });
+      if (!ticket.paymentCollectionRequestedAt) return NextResponse.json({ success: false, message: "The engineer has not requested payment collection approval" }, { status: 409 });
+      if (["completed", "closed", "cancelled"].includes(ticket.status)) return NextResponse.json({ success: false, message: "Payment collection cannot be approved for a closed ticket" }, { status: 409 });
+      ticket.paymentCollectionApprovedAt = new Date();
+      await ticket.save();
+      return NextResponse.json({ success: true, message: "Payment collection approved. The approved customer charge is now visible to the assigned engineer.", ticket });
+    }
+
     if (body.action === "assign_engineer") {
       const engineerId = String(body.engineerId || "");
       if (!mongoose.isValidObjectId(engineerId)) {
