@@ -95,10 +95,15 @@ export async function POST(request: Request, context: Context) {
 
       ticket.engineerId = engineer._id;
       ticket.paymentPlan = paymentPlan as (typeof validPaymentPlans)[number];
-      if (serviceLocation) ticket.serviceLocation = serviceLocation;
-      else if (!ticket.serviceLocation && serviceRequest.serviceLocation) ticket.serviceLocation = serviceRequest.serviceLocation;
-      if (serviceMapUrl) ticket.serviceMapUrl = serviceMapUrl;
-      else if (!ticket.serviceMapUrl && serviceRequest.serviceMapUrl) ticket.serviceMapUrl = serviceRequest.serviceMapUrl;
+      if (serviceLocation) {
+        ticket.serviceLocation = serviceLocation;
+        ticket.serviceMapUrl = serviceMapUrl || null;
+      } else if (!ticket.serviceLocation && serviceRequest.serviceLocation) {
+        ticket.serviceLocation = serviceRequest.serviceLocation;
+        ticket.serviceMapUrl = serviceMapUrl || serviceRequest.serviceMapUrl || null;
+      } else if (serviceMapUrl) {
+        ticket.serviceMapUrl = serviceMapUrl;
+      }
       if (ticket.paymentPlan !== "collect_on_visit") {
         ticket.paymentCollectionRequestedAt = null;
         ticket.paymentCollectionApprovedAt = null;
