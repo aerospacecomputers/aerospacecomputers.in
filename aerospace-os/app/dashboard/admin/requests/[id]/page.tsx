@@ -43,6 +43,8 @@ export default function AdminRequestDetailPage() {
   const [serviceMapUrl, setServiceMapUrl] = useState("");
   const [savedLocations, setSavedLocations] = useState<SavedLocation[]>([]);
   const [selectedSavedLocation, setSelectedSavedLocation] = useState("");
+  const [saveLocationForCustomer, setSaveLocationForCustomer] = useState(false);
+  const [locationLabel, setLocationLabel] = useState("");
   const [assigningEngineer, setAssigningEngineer] = useState(false);
   const [creatingTicket, setCreatingTicket] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -156,7 +158,7 @@ export default function AdminRequestDetailPage() {
       const response = await fetch(`/api/admin/service-requests/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "assign_engineer", engineerId: selectedEngineer, paymentPlan, serviceLocation, serviceMapUrl }),
+        body: JSON.stringify({ action: "assign_engineer", engineerId: selectedEngineer, paymentPlan, serviceLocation, serviceMapUrl, saveLocationForCustomer, locationLabel }),
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.message || "Could not assign engineer.");
@@ -265,6 +267,8 @@ export default function AdminRequestDetailPage() {
                 <textarea value={serviceLocation} onChange={(event) => { setServiceLocation(event.target.value); setSelectedSavedLocation(""); }} placeholder="Full address, factory, office, floor, landmark" maxLength={1000} rows={3} />
                 <input value={serviceMapUrl} onChange={(event) => setServiceMapUrl(event.target.value)} placeholder="Google Maps link (optional)" maxLength={2000} />
                 <span className="muted small">Select a customer saved location or enter a corrected address. The engineer sees the address and map buttons, not the raw map URL.</span>
+                <label style={{display:"flex",alignItems:"center",gap:"8px",marginTop:"8px"}}><input type="checkbox" checked={saveLocationForCustomer} onChange={(event) => setSaveLocationForCustomer(event.target.checked)} /> Save this location to the customer’s saved locations</label>
+                {saveLocationForCustomer && <input value={locationLabel} onChange={(event) => setLocationLabel(event.target.value)} placeholder="Location name, e.g. Gurgaon Factory" maxLength={100} />}
               </label>
               <label className="engineerSelectLabel">Payment arrangement
                 <select value={paymentPlan} onChange={(event) => setPaymentPlan(event.target.value as typeof paymentPlan)} required>
