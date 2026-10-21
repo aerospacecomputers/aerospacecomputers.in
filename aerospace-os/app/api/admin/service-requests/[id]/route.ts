@@ -143,6 +143,7 @@ export async function POST(request: Request, context: Context) {
         status: "created",
         scheduledDate: acceptedOffer.proposedDate,
         scheduledTime: acceptedOffer.proposedTime,
+        serviceLocation: serviceRequest.serviceLocation || null,
         approvedAmount: acceptedOffer.totalAmount,
         customerAcceptedAt: acceptedOffer.customerRespondedAt || new Date(),
         ticketCreatedAt: new Date(),
