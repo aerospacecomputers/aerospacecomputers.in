@@ -106,6 +106,7 @@ export async function POST(request: Request) {
       subject: body.subject.trim(),
 
       description: body.description.trim(),
+      serviceLocation: typeof body.serviceLocation === "string" ? body.serviceLocation.trim().slice(0, 1000) || null : null,
 
       serviceType: body.serviceType?.trim() || "",
 
