@@ -16,7 +16,7 @@ export async function GET() {
     await connectMongoDB();
     const engineer = await User.findById(session.userId).select("name email").lean();
     const tickets = await Ticket.find({ engineerId: session.userId })
-      .populate({ path: "serviceRequestId", select: "requestNumber subject description serviceType preferredDate preferredTime status" })
+      .populate({ path: "serviceRequestId", select: "requestNumber subject description serviceType preferredDate preferredTime status attachmentUrls" })
       .populate({ path: "customerId", select: "name email phone customerType companyId" })
       .sort({ engineerAssignedAt: -1, updatedAt: -1 }).lean();
     return NextResponse.json({ success: true, engineer: engineer ? { name: engineer.name, email: engineer.email } : null, tickets });
