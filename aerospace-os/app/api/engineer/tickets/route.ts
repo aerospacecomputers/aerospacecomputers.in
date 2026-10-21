@@ -15,10 +15,14 @@ export async function GET() {
   try {
     await connectMongoDB();
     const engineer = await User.findById(session.userId).select("name email").lean();
-    const tickets = await Ticket.find({ engineerId: session.userId })
+    const records = await Ticket.find({ engineerId: session.userId })
       .populate({ path: "serviceRequestId", select: "requestNumber subject description serviceType preferredDate preferredTime status attachmentUrls" })
       .populate({ path: "customerId", select: "name email phone customerType companyId" })
       .sort({ engineerAssignedAt: -1, updatedAt: -1 }).lean();
+    const tickets = records.map((ticket) => {
+      const { approvedAmount, ...safeTicket } = ticket;
+      return ticket.paymentCollectionApprovedAt ? { ...safeTicket, approvedAmount } : safeTicket;
+    });
     return NextResponse.json({ success: true, engineer: engineer ? { name: engineer.name, email: engineer.email } : null, tickets });
   } catch (error) {
     console.error("Engineer tickets GET error:", error);
@@ -33,6 +37,20 @@ export async function POST(request: Request) {
   try {
     const body = await request.json();
     const ticketId = String(body.ticketId || "");
+    const action = String(body.action || "");
+    if (action === "request_payment_collection") {
+      if (!mongoose.isValidObjectId(ticketId)) return NextResponse.json({ success: false, message: "Invalid ticket ID" }, { status: 400 });
+      await connectMongoDB();
+      const ticket = await Ticket.findOne({ _id: ticketId, engineerId: session.userId });
+      if (!ticket) return NextResponse.json({ success: false, message: "Ticket not found in your assigned work" }, { status: 404 });
+      if (["completed", "closed", "cancelled"].includes(ticket.status)) return NextResponse.json({ success: false, message: "Payment collection cannot be requested for a closed ticket" }, { status: 409 });
+      if (ticket.paymentCollectionApprovedAt) return NextResponse.json({ success: false, message: "Payment collection is already approved for this ticket" }, { status: 409 });
+      if (!ticket.paymentCollectionRequestedAt) {
+        ticket.paymentCollectionRequestedAt = new Date();
+        await ticket.save();
+      }
+      return NextResponse.json({ success: true, message: "Payment collection request sent to the administrator for approval." });
+    }
     const status = String(body.status || "");
     if (!mongoose.isValidObjectId(ticketId)) return NextResponse.json({ success: false, message: "Invalid ticket ID" }, { status: 400 });
     if (!allowed.includes(status)) return NextResponse.json({ success: false, message: "Invalid ticket status" }, { status: 400 });
