@@ -22,7 +22,7 @@ export async function GET() {
       name:user.name,email:user.email,phone:user.phone||profile?.phone||"",address:profile?.address||"",
       city:profile?.city||"",state:profile?.state||"",pincode:profile?.pincode||"",
       customerType:user.customerType||profile?.customerType||"individual",companyId:user.companyId||profile?.companyId||null,
-      companyName:profile?.companyName||null,createdAt:user.createdAt
+      companyName:profile?.companyName||null,savedLocations:profile?.savedLocations||[],createdAt:user.createdAt
     },requests,devices});
   } catch (error) {
     console.error("GET customer dashboard error:",error);
@@ -38,18 +38,19 @@ export async function PATCH(request:Request) {
     const name=String(body.name||"").trim(), phone=String(body.phone||"").trim();
     const address=String(body.address||"").trim(), city=String(body.city||"").trim();
     const state=String(body.state||"").trim(), pincode=String(body.pincode||"").trim();
+    const savedLocations=Array.isArray(body.savedLocations) ? body.savedLocations.slice(0,30).map((item: {label?:unknown;address?:unknown;mapUrl?:unknown})=>({label:String(item.label||"").trim().slice(0,100),address:String(item.address||"").trim().slice(0,1000),mapUrl:String(item.mapUrl||"").trim().slice(0,2000)})).filter((item: {label:string;address:string;mapUrl:string})=>item.label&&item.address) : undefined;
     if(!name||!phone) return NextResponse.json({success:false,message:"Name and phone are required"},{status:400});
     await connectMongoDB();
     const user=await User.findByIdAndUpdate(session.userId,{$set:{name,phone}},{new:true}).select("-passwordHash").lean();
     if(!user) return NextResponse.json({success:false,message:"Customer account not found"},{status:404});
     const profile=await CustomerProfile.findOneAndUpdate(
       {userId:session.userId},
-      {$set:{contactPerson:name,phone,address,city,state,pincode}},
+      {$set:{contactPerson:name,phone,address,city,state,pincode,...(savedLocations ? {savedLocations} : {})}},
       {new:true,upsert:true,setDefaultsOnInsert:true}
     ).lean();
     return NextResponse.json({success:true,message:"Profile updated successfully",profile:{
       name:user.name,email:user.email,phone:user.phone||"",address:profile?.address||"",city:profile?.city||"",
-      state:profile?.state||"",pincode:profile?.pincode||"",customerType:user.customerType||"individual",
+      state:profile?.state||"",pincode:profile?.pincode||"",savedLocations:profile?.savedLocations||[],customerType:user.customerType||"individual",
       companyId:user.companyId||null,companyName:profile?.companyName||null,createdAt:user.createdAt
     }});
   } catch (error) {
