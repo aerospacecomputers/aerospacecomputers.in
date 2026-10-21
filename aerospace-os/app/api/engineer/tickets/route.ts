@@ -44,6 +44,7 @@ export async function POST(request: Request) {
       const ticket = await Ticket.findOne({ _id: ticketId, engineerId: session.userId });
       if (!ticket) return NextResponse.json({ success: false, message: "Ticket not found in your assigned work" }, { status: 404 });
       if (["completed", "closed", "cancelled"].includes(ticket.status)) return NextResponse.json({ success: false, message: "Payment collection cannot be requested for a closed ticket" }, { status: 409 });
+      if (ticket.paymentPlan !== "collect_on_visit") return NextResponse.json({ success: false, message: "This ticket is not marked for payment collection by the engineer. Contact the administrator if the arrangement is incorrect." }, { status: 409 });
       if (ticket.paymentCollectionApprovedAt) return NextResponse.json({ success: false, message: "Payment collection is already approved for this ticket" }, { status: 409 });
       if (!ticket.paymentCollectionRequestedAt) {
         ticket.paymentCollectionRequestedAt = new Date();
