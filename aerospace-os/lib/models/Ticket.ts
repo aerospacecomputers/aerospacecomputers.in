@@ -28,6 +28,7 @@ export interface ITicket {
   scheduledTime?: string | null;
 
   approvedAmount: number;
+  paymentPlan?: "collect_on_visit" | "already_collected" | "amc_covered" | "pay_later" | null;
 
   customerAcceptedAt?: Date | null;
   ticketCreatedAt: Date;
@@ -117,6 +118,12 @@ const TicketSchema = new Schema<ITicket>(
       type: Number,
       required: true,
       min: 0,
+    },
+
+    paymentPlan: {
+      type: String,
+      enum: ["collect_on_visit", "already_collected", "amc_covered", "pay_later"],
+      default: null,
     },
 
     customerAcceptedAt: {
