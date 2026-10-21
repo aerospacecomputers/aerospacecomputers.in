@@ -22,6 +22,7 @@ export interface IServiceRequest {
 
   subject: string;
   description: string;
+  serviceLocation?: string | null;
 
   serviceType?: string;
 
@@ -67,6 +68,13 @@ const ServiceRequestSchema = new Schema<IServiceRequest>(
       type: String,
       required: true,
       trim: true,
+    },
+
+    serviceLocation: {
+      type: String,
+      default: null,
+      trim: true,
+      maxlength: 1000,
     },
 
     serviceType: {
