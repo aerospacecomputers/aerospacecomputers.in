@@ -55,6 +55,7 @@ export async function POST(request: Request, context: Context) {
       const ticket = await Ticket.findOne({ serviceRequestId: serviceRequest._id });
       if (!ticket) return NextResponse.json({ success: false, message: "Ticket not found" }, { status: 404 });
       if (!ticket.engineerId) return NextResponse.json({ success: false, message: "Assign an engineer before approving payment collection" }, { status: 409 });
+      if (ticket.paymentPlan !== "collect_on_visit") return NextResponse.json({ success: false, message: "This ticket is not marked for payment collection by the engineer" }, { status: 409 });
       if (!ticket.paymentCollectionRequestedAt) return NextResponse.json({ success: false, message: "The engineer has not requested payment collection approval" }, { status: 409 });
       if (["completed", "closed", "cancelled"].includes(ticket.status)) return NextResponse.json({ success: false, message: "Payment collection cannot be approved for a closed ticket" }, { status: 409 });
       ticket.paymentCollectionApprovedAt = new Date();
@@ -64,6 +65,11 @@ export async function POST(request: Request, context: Context) {
 
     if (body.action === "assign_engineer") {
       const engineerId = String(body.engineerId || "");
+      const validPaymentPlans = ["collect_on_visit", "already_collected", "amc_covered", "pay_later"] as const;
+      const paymentPlan = String(body.paymentPlan || "");
+      if (!validPaymentPlans.includes(paymentPlan as (typeof validPaymentPlans)[number])) {
+        return NextResponse.json({ success: false, message: "Choose a valid payment arrangement" }, { status: 400 });
+      }
       if (!mongoose.isValidObjectId(engineerId)) {
         return NextResponse.json({ success: false, message: "Choose a valid engineer" }, { status: 400 });
       }
@@ -82,6 +88,11 @@ export async function POST(request: Request, context: Context) {
       if (!engineer) return NextResponse.json({ success: false, message: "Active engineer account not found" }, { status: 404 });
 
       ticket.engineerId = engineer._id;
+      ticket.paymentPlan = paymentPlan as (typeof validPaymentPlans)[number];
+      if (ticket.paymentPlan !== "collect_on_visit") {
+        ticket.paymentCollectionRequestedAt = null;
+        ticket.paymentCollectionApprovedAt = null;
+      }
       ticket.status = "assigned";
       ticket.engineerAssignedAt = new Date();
       await ticket.save();
