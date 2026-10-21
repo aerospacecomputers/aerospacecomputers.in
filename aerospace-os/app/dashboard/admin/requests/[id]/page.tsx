@@ -9,6 +9,7 @@ type RequestRecord = {
   subject: string;
   description: string;
   serviceLocation?: string | null;
+  serviceMapUrl?: string | null;
   serviceType?: string;
   preferredDate?: string | null;
   preferredTime?: string | null;
@@ -19,7 +20,7 @@ type RequestRecord = {
 type Customer = { name?: string; email?: string; phone?: string; customerType?: string; companyId?: string | null } | null;
 type Offer = { proposedDate: string; proposedTime: string; labourCharges: number; installationMaterial: number; travelCharges: number; otherCharges: number; subtotal: number; gstPercentage: number; gstAmount: number; totalAmount: number; status: string; notes?: string; customerResponse?: string | null; customerRespondedAt?: string | null; createdAt?: string; updatedAt?: string } | null;
 type OfferHistoryItem = NonNullable<Offer>;
-type TicketRecord = { _id: string; ticketNumber: string; status: string; approvedAmount: number; ticketCreatedAt?: string; engineerId?: string | null; engineerAssignedAt?: string | null; paymentPlan?: "collect_on_visit" | "already_collected" | "amc_covered" | "pay_later" | null; serviceLocation?: string | null; paymentCollectionRequestedAt?: string | null; paymentCollectionApprovedAt?: string | null } | null;
+type TicketRecord = { _id: string; ticketNumber: string; status: string; approvedAmount: number; ticketCreatedAt?: string; engineerId?: string | null; engineerAssignedAt?: string | null; paymentPlan?: "collect_on_visit" | "already_collected" | "amc_covered" | "pay_later" | null; serviceLocation?: string | null; serviceMapUrl?: string | null; paymentCollectionRequestedAt?: string | null; paymentCollectionApprovedAt?: string | null } | null;
 type EngineerOption = { _id: string; name: string; email: string; phone?: string };
 type SavedLocation = { label: string; address: string; mapUrl?: string };
 
