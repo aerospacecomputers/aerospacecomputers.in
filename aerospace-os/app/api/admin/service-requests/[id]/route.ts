@@ -68,6 +68,7 @@ export async function POST(request: Request, context: Context) {
       const validPaymentPlans = ["collect_on_visit", "already_collected", "amc_covered", "pay_later"] as const;
       const paymentPlan = String(body.paymentPlan || "");
       const serviceLocation = typeof body.serviceLocation === "string" ? body.serviceLocation.trim().slice(0, 1000) : "";
+      const serviceMapUrl = typeof body.serviceMapUrl === "string" ? body.serviceMapUrl.trim().slice(0, 2000) : "";
       if (!validPaymentPlans.includes(paymentPlan as (typeof validPaymentPlans)[number])) {
         return NextResponse.json({ success: false, message: "Choose a valid payment arrangement" }, { status: 400 });
       }
@@ -92,6 +93,8 @@ export async function POST(request: Request, context: Context) {
       ticket.paymentPlan = paymentPlan as (typeof validPaymentPlans)[number];
       if (serviceLocation) ticket.serviceLocation = serviceLocation;
       else if (!ticket.serviceLocation && serviceRequest.serviceLocation) ticket.serviceLocation = serviceRequest.serviceLocation;
+      if (serviceMapUrl) ticket.serviceMapUrl = serviceMapUrl;
+      else if (!ticket.serviceMapUrl && serviceRequest.serviceMapUrl) ticket.serviceMapUrl = serviceRequest.serviceMapUrl;
       if (ticket.paymentPlan !== "collect_on_visit") {
         ticket.paymentCollectionRequestedAt = null;
         ticket.paymentCollectionApprovedAt = null;
@@ -144,6 +147,7 @@ export async function POST(request: Request, context: Context) {
         scheduledDate: acceptedOffer.proposedDate,
         scheduledTime: acceptedOffer.proposedTime,
         serviceLocation: serviceRequest.serviceLocation || null,
+        serviceMapUrl: serviceRequest.serviceMapUrl || null,
         approvedAmount: acceptedOffer.totalAmount,
         customerAcceptedAt: acceptedOffer.customerRespondedAt || new Date(),
         ticketCreatedAt: new Date(),
