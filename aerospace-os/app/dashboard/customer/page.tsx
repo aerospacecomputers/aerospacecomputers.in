@@ -1161,7 +1161,7 @@ export default function CustomerDashboard() {
                       <input value={serviceLocation} onChange={(e) => { setServiceLocation(e.target.value); setSelectedServiceLocation(""); }} placeholder="Full address, factory, office, floor, landmark" maxLength={1000} />
                       <input value={serviceMapUrl} onChange={(e) => setServiceMapUrl(e.target.value)} placeholder="Google Maps link (optional)" maxLength={2000} />
                       <small>Enter a clear address. A map link is optional and will not be shown as text to the engineer.</small>
-                      <label style={{display:"flex",alignItems:"center",gap:"8px",marginTop:"8px"}}><input type="checkbox" checked={saveServiceLocation} onChange={(e) => setSaveServiceLocation(e.target.checked)} /> Save this location for future service requests</label>
+                      <div style={{display:"flex",alignItems:"center",gap:"8px",marginTop:"8px"}}><input type="checkbox" checked={saveServiceLocation} onChange={(e) => setSaveServiceLocation(e.target.checked)} /><span>Save this location for future service requests</span></div>
                       {saveServiceLocation && <input value={serviceLocationLabel} onChange={(e) => setServiceLocationLabel(e.target.value)} placeholder="Location name, e.g. Gurgaon Factory" maxLength={100} />}
                     </label>
 
