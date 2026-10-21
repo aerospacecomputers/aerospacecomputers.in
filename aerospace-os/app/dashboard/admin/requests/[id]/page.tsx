@@ -21,6 +21,7 @@ type Offer = { proposedDate: string; proposedTime: string; labourCharges: number
 type OfferHistoryItem = NonNullable<Offer>;
 type TicketRecord = { _id: string; ticketNumber: string; status: string; approvedAmount: number; ticketCreatedAt?: string; engineerId?: string | null; engineerAssignedAt?: string | null; paymentPlan?: "collect_on_visit" | "already_collected" | "amc_covered" | "pay_later" | null; serviceLocation?: string | null; paymentCollectionRequestedAt?: string | null; paymentCollectionApprovedAt?: string | null } | null;
 type EngineerOption = { _id: string; name: string; email: string; phone?: string };
+type SavedLocation = { label: string; address: string; mapUrl?: string };
 
 const money = (value: number) => new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 2 }).format(value || 0);
 const dateText = (value?: string | null) => value ? new Date(value).toLocaleDateString("en-IN", { day: "2-digit", month: "short", year: "numeric" }) : "—";
@@ -39,6 +40,9 @@ export default function AdminRequestDetailPage() {
   const [selectedEngineer, setSelectedEngineer] = useState("");
   const [paymentPlan, setPaymentPlan] = useState<"collect_on_visit" | "already_collected" | "amc_covered" | "pay_later">("collect_on_visit");
   const [serviceLocation, setServiceLocation] = useState("");
+  const [serviceMapUrl, setServiceMapUrl] = useState("");
+  const [savedLocations, setSavedLocations] = useState<SavedLocation[]>([]);
+  const [selectedSavedLocation, setSelectedSavedLocation] = useState("");
   const [assigningEngineer, setAssigningEngineer] = useState(false);
   const [creatingTicket, setCreatingTicket] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -75,6 +79,9 @@ export default function AdminRequestDetailPage() {
       setSelectedEngineer(data.ticket?.engineerId ? String(data.ticket.engineerId) : "");
       setPaymentPlan(data.ticket?.paymentPlan || "collect_on_visit");
       setServiceLocation(data.ticket?.serviceLocation || data.request?.serviceLocation || "");
+      setServiceMapUrl(data.ticket?.serviceMapUrl || data.request?.serviceMapUrl || "");
+      setSavedLocations(Array.isArray(data.savedLocations) ? data.savedLocations : []);
+      setSelectedSavedLocation("");
       if (data.offer) {
         const d = new Date(data.offer.proposedDate);
         setProposedDate(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`);
@@ -149,7 +156,7 @@ export default function AdminRequestDetailPage() {
       const response = await fetch(`/api/admin/service-requests/${id}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: "assign_engineer", engineerId: selectedEngineer, paymentPlan, serviceLocation }),
+        body: JSON.stringify({ action: "assign_engineer", engineerId: selectedEngineer, paymentPlan, serviceLocation, serviceMapUrl }),
       });
       const data = await response.json();
       if (!response.ok || !data.success) throw new Error(data.message || "Could not assign engineer.");
@@ -254,8 +261,10 @@ export default function AdminRequestDetailPage() {
               <h2>{ticket.engineerId ? "Change assigned engineer" : "Assign an engineer"}</h2>
               <p className="muted small">Ticket {ticket.ticketNumber} · {ticket.engineerId ? "An engineer is currently assigned." : "No engineer is assigned yet."}</p>
               <label className="engineerSelectLabel">Service location (optional)
-                <textarea value={serviceLocation} onChange={(event) => setServiceLocation(event.target.value)} placeholder="Address, building, floor, landmark, or Google Maps link" maxLength={1000} rows={3} />
-                <span className="muted small">You can use the customer location or enter a corrected address / map link for the engineer.</span>
+                {savedLocations.length > 0 && <select value={selectedSavedLocation} onChange={(event) => { const value = event.target.value; setSelectedSavedLocation(value); const item = savedLocations.find((location) => location.label + "|" + location.address === value); if (item) { setServiceLocation(item.address); setServiceMapUrl(item.mapUrl || ""); } }}><option value="">Use current address or choose saved location</option>{savedLocations.map((item) => <option key={item.label + "|" + item.address} value={item.label + "|" + item.address}>{item.label} — {item.address}</option>)}</select>}
+                <textarea value={serviceLocation} onChange={(event) => { setServiceLocation(event.target.value); setSelectedSavedLocation(""); }} placeholder="Full address, factory, office, floor, landmark" maxLength={1000} rows={3} />
+                <input value={serviceMapUrl} onChange={(event) => setServiceMapUrl(event.target.value)} placeholder="Google Maps link (optional)" maxLength={2000} />
+                <span className="muted small">Select a customer saved location or enter a corrected address. The engineer sees the address and map buttons, not the raw map URL.</span>
               </label>
               <label className="engineerSelectLabel">Payment arrangement
                 <select value={paymentPlan} onChange={(event) => setPaymentPlan(event.target.value as typeof paymentPlan)} required>
