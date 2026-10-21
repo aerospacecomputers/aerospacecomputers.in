@@ -268,7 +268,7 @@ export default function AdminRequestDetailPage() {
                 <textarea value={serviceLocation} onChange={(event) => { setServiceLocation(event.target.value); setSelectedSavedLocation(""); }} placeholder="Full address, factory, office, floor, landmark" maxLength={1000} rows={3} />
                 <input value={serviceMapUrl} onChange={(event) => setServiceMapUrl(event.target.value)} placeholder="Google Maps link (optional)" maxLength={2000} />
                 <span className="muted small">Select a customer saved location or enter a corrected address. The engineer sees the address and map buttons, not the raw map URL.</span>
-                <label style={{display:"flex",alignItems:"center",gap:"8px",marginTop:"8px"}}><input type="checkbox" checked={saveLocationForCustomer} onChange={(event) => setSaveLocationForCustomer(event.target.checked)} /> Save this location to the customer’s saved locations</label>
+                <div style={{display:"flex",alignItems:"center",gap:"8px",marginTop:"8px"}}><input type="checkbox" checked={saveLocationForCustomer} onChange={(event) => setSaveLocationForCustomer(event.target.checked)} /><span>Save this location to the customer’s saved locations</span></div>
                 {saveLocationForCustomer && <input value={locationLabel} onChange={(event) => setLocationLabel(event.target.value)} placeholder="Location name, e.g. Gurgaon Factory" maxLength={100} />}
               </label>
               <label className="engineerSelectLabel">Payment arrangement
