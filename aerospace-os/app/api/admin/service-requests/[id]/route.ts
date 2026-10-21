@@ -6,6 +6,7 @@ import ServiceRequest from "@/lib/models/ServiceRequest";
 import ServiceOffer from "@/lib/models/ServiceOffer";
 import User from "@/lib/models/User";
 import Ticket from "@/lib/models/Ticket";
+import CustomerProfile from "@/lib/models/CustomerProfile";
 
 type Context = { params: Promise<{ id: string }> };
 
@@ -22,15 +23,16 @@ export async function GET(_request: Request, context: Context) {
     const serviceRequest = await ServiceRequest.findById(id).lean();
     if (!serviceRequest) return NextResponse.json({ success: false, message: "Service request not found" }, { status: 404 });
 
-    const [customer, offers, ticket, engineers] = await Promise.all([
+    const [customer, offers, ticket, engineers, customerProfile] = await Promise.all([
       User.findById(serviceRequest.customerId).select("name email phone customerType companyId").lean(),
       ServiceOffer.find({ serviceRequestId: serviceRequest._id }).sort({ createdAt: 1 }).lean(),
       Ticket.findOne({ serviceRequestId: serviceRequest._id }).lean(),
       User.find({ role: "engineer", active: true }).select("_id name email phone").sort({ name: 1 }).lean(),
+      CustomerProfile.findOne({ userId: serviceRequest.customerId }).select("savedLocations").lean(),
     ]);
     const offer = offers.length ? offers[offers.length - 1] : null;
 
-    return NextResponse.json({ success: true, request: serviceRequest, customer, offer, offers, ticket, engineers });
+    return NextResponse.json({ success: true, request: serviceRequest, customer, offer, offers, ticket, engineers, savedLocations: customerProfile?.savedLocations || [] });
   } catch (error) {
     console.error("Admin request detail error:", error);
     return NextResponse.json({ success: false, message: "Unable to load service request" }, { status: 500 });
